@@ -43,10 +43,12 @@ static NSString * image5 = @"https://img05.allinmd.cn/public1/M00/0C/71/wKgBL1nl
 - (void)buttonClick:(UIButton *)button {
     
     WYPhotoBrowseController *browseVC = [[WYPhotoBrowseController alloc] init];
+    browseVC.browseType = eWYPhotoBrowseSave;
     NSArray *urlArray = [NSArray arrayWithObjects:image1,image2,image3,image4,image5, nil];
     for (int i = 1 ; i <= 5; i ++) {
         WYPhotoBrowseModel *model = [[WYPhotoBrowseModel alloc] init];
         model.photoUrl = urlArray[i-1];
+        model.photoDes= @"jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看";
         [browseVC.dataArray addObject:model];
     }
     [self.navigationController pushViewController:browseVC animated:YES];

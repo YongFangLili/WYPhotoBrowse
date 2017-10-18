@@ -115,8 +115,6 @@
     CGRect rct = self.imageView.frame;
     rct.origin.x = MAX((NSInteger)(Ws-W)/2, 0);
     rct.origin.y = MAX((NSInteger)(Hs-H)/2, 0);
-    
-    
     self.imageView.frame = rct;
 }
 
@@ -139,7 +137,7 @@
                             size.height / _scrollView.frame.size.height);
         if(ratio < 1)
         {
-            self.imageView.contentMode = UIViewContentModeCenter;
+//            self.imageView.contentMode = UIViewContentModeCenter;
             self.imageView.frame = CGRectMake(0, 0, size.width, size.height);
             self.imageView.center = CGPointMake(CGRectGetWidth(_scrollView.frame)/2.0,
                                                     CGRectGetHeight(_scrollView.frame)/2.0);
@@ -150,7 +148,7 @@
             self.imageView.frame = CGRectMake(0, 0,
                                                   CGRectGetWidth(_scrollView.frame),
                                                   CGRectGetHeight(_scrollView.frame));
-            self.imageView.contentMode = UIViewContentModeScaleAspectFit;
+//            self.imageView.contentMode = UIViewContentModeScaleAspectFit;
         }
         
 //        self.imageView.frame = CGRectMake(0, 0,

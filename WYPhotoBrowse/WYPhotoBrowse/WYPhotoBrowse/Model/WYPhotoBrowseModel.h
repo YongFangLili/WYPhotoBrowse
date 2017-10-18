@@ -10,11 +10,12 @@
 
 @interface WYPhotoBrowseModel : NSObject
 
-// imageUrl
+/** 图片imageUrl */
 @property (nonatomic, copy) NSString *photoUrl;
-
-// 图片image
+/** 图片imageUrl */
 @property (nonatomic, copy) NSString *photoImage;
+/** 图片描述 */
+@property (nonatomic, copy) NSString *photoDes;
 
 /**
  *   获取图片_c地址 75%.

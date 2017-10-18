@@ -9,6 +9,19 @@
 #import <UIKit/UIKit.h>
 #import "WYPhotoBrowseModel.h"
 
+typedef NS_ENUM(NSUInteger, eWYPhotoBrowseType) {
+    
+    // 删除
+    eWYPhotoBrowseDelete = 1,
+    // 保存
+    eWYPhotoBrowseSave = 2,
+};
+
+@protocol WYPhotoBrowseControllerDelegate <NSObject>
+
+
+@end
+
 @interface WYPhotoBrowseController : UIViewController
 
 /** 当前的currentIndex */
@@ -16,4 +29,8 @@
 
 /** 照片数组 */
 @property (nonatomic, strong) NSMutableArray *dataArray;
+
+/** 浏览类型 */
+@property (nonatomic, assign) eWYPhotoBrowseType browseType;
+
 @end
