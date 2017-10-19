@@ -9,9 +9,20 @@
 #import <UIKit/UIKit.h>
 #import "WYPhotoBrowseModel.h"
 
-@interface WYPhotoViewCell : UICollectionViewCell
+@protocol WYPhotoViewCellDelegate <NSObject>
 
+/**
+ * @brief 单击手势点击
+ */
+- (void)clickSingleGesture;
+
+@end
+
+@interface WYPhotoViewCell : UICollectionViewCell
 /** 模型 */
 @property (nonatomic, strong) WYPhotoBrowseModel *model;
+
+/** 代理 */
+@property (nonatomic, weak)id<WYPhotoViewCellDelegate>delegate;
 
 @end

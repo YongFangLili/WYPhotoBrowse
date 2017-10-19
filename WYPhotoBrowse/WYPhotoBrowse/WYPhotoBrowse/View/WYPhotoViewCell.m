@@ -76,6 +76,9 @@
 - (void)handleSingleTap:(UITapGestureRecognizer *)recognizer {
     
     // 单个手指单击，设置隐藏与显示
+    if (self.delegate && [self.delegate respondsToSelector:@selector(clickSingleGesture)]) {
+        [self.delegate clickSingleGesture];
+    }
 }
 
 

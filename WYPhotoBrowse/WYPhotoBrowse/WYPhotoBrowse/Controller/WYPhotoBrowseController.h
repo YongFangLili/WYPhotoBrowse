@@ -19,6 +19,11 @@ typedef NS_ENUM(NSUInteger, eWYPhotoBrowseType) {
 
 @protocol WYPhotoBrowseControllerDelegate <NSObject>
 
+@optional
+- (void)wyPhotoBrowseControllerLoadView;
+- (void)wyPhotoBrowseControllerViewWillAppear;
+- (void)wyPhotoBrowseControllerViewWillDissAppear;
+- (void)ClickwyPhotoBrowseRightBtn;
 
 @end
 

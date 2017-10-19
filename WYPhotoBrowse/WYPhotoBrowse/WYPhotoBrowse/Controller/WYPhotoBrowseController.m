@@ -10,7 +10,12 @@
 #import "WYPhotoViewCell.h"
 #define kDesphotoViewWidth ([UIScreen mainScreen].bounds.size.width - 15 - 15)
 static NSString *kPhotoCellIdentifier = @"photoCellIdentifier";
-@interface WYPhotoBrowseController () <UICollectionViewDelegate,UICollectionViewDataSource,UITextViewDelegate>
+@interface WYPhotoBrowseController ()
+<UICollectionViewDelegate,
+UICollectionViewDataSource,
+UITextViewDelegate,
+WYPhotoViewCellDelegate
+>
 
 /** collectionView */
 @property (nonatomic, strong) UICollectionView *collectionView;
@@ -22,7 +27,9 @@ static NSString *kPhotoCellIdentifier = @"photoCellIdentifier";
 @property (nonatomic, strong) UITextView *photoDesView;
 /** pageLable */
 @property (nonatomic, strong) UILabel *pageLable;
-@end
+/** title */
+@property (nonatomic, strong) UILabel *titleLable;
+ @end
 
 @implementation WYPhotoBrowseController
 
@@ -152,17 +159,18 @@ static NSString *kPhotoCellIdentifier = @"photoCellIdentifier";
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
 
     WYPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kPhotoCellIdentifier forIndexPath:indexPath];
+    cell.delegate = self;
     cell.model = self.dataArray[indexPath.row];
     return cell;
 }
 
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     
     // 获取当前的index
+    if ([scrollView isEqual:self.photoDesView]) return;
     NSInteger index = scrollView.contentOffset.x / [UIScreen mainScreen].bounds.size.width;
     self.currentIndex = index;
      [self textViewCursorIsHidden:1];
-    if ([scrollView isEqual:self.photoDesView]) return;
     // 更新页码与详情
     [self updatePageDes];
 }
@@ -171,6 +179,7 @@ static NSString *kPhotoCellIdentifier = @"photoCellIdentifier";
     //  更新textView禁止编辑
     return NO;
 }
+
 //textView滚动条是否显示
 - (void)textViewCursorIsHidden:(BOOL) isHidden {
     // && img.autoresizingMask == UIViewAutoresizingNone
@@ -178,9 +187,13 @@ static NSString *kPhotoCellIdentifier = @"photoCellIdentifier";
         if ([img isKindOfClass:[UIImageView class]] ){
             img.backgroundColor = [UIColor redColor];
             [img setAlpha:1.0];
-//            [img setAlpha:isHidden];
         }
     }
+}
+
+- (void)clickSingleGesture {
+    
+    // 隐藏动画
 }
 
 #pragma mark - lazy
@@ -235,9 +248,19 @@ static NSString *kPhotoCellIdentifier = @"photoCellIdentifier";
     if (!_pageLable) {
         _pageLable = [[UILabel alloc] init];
         _pageLable.textColor = [UIColor whiteColor];
-        _pageLable.textAlignment = NSTextAlignmentCenter;
+        _pageLable.textAlignment = NSTextAlignmentRight;
     }
     return _pageLable;
+}
+
+- (UILabel *)titleLable {
+    
+    if (!_titleLable) {
+        _titleLable = [[UILabel alloc] init];
+        _titleLable.textColor = [UIColor whiteColor];
+        _titleLable.textAlignment = NSTextAlignmentCenter;
+    }
+    return _titleLable;
 }
 
 - (UIView *)bottomView {
