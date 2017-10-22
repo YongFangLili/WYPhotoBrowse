@@ -122,7 +122,7 @@ WYPhotoViewCellDelegate
     self.bottomView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height -  bottomViewHeight, [UIScreen mainScreen].bounds.size.width, bottomViewHeight);
     self.pageLable.frame = CGRectMake(0, bottomViewHeight - 30, [UIScreen mainScreen].bounds.size.width, 30);
     self.photoDesView.frame = CGRectMake(15, 15, kDesphotoViewWidth, desViewHeight);
-    [self textViewCursorIsHidden:1];
+//    [self textViewCursorIsHidden:1];
 }
 
 #pragma mark - click Mehod
@@ -170,7 +170,7 @@ WYPhotoViewCellDelegate
     if ([scrollView isEqual:self.photoDesView]) return;
     NSInteger index = scrollView.contentOffset.x / [UIScreen mainScreen].bounds.size.width;
     self.currentIndex = index;
-     [self textViewCursorIsHidden:1];
+//     [self textViewCursorIsHidden:1];
     // 更新页码与详情
     [self updatePageDes];
 }
@@ -180,16 +180,16 @@ WYPhotoViewCellDelegate
     return NO;
 }
 
-//textView滚动条是否显示
-- (void)textViewCursorIsHidden:(BOOL) isHidden {
-    // && img.autoresizingMask == UIViewAutoresizingNone
-    for(UIView *img in [self.photoDesView subviews]) {
-        if ([img isKindOfClass:[UIImageView class]] ){
-            img.backgroundColor = [UIColor redColor];
-            [img setAlpha:1.0];
-        }
-    }
-}
+////textView滚动条是否显示
+//- (void)textViewCursorIsHidden:(BOOL) isHidden {
+//    // && img.autoresizingMask == UIViewAutoresizingNone
+//    for(UIView *img in [self.photoDesView subviews]) {
+//        if ([img isKindOfClass:[UIImageView class]] ){
+//            img.backgroundColor = [UIColor redColor];
+//            [img setAlpha:1.0];
+//        }
+//    }
+//}
 
 - (void)clickSingleGesture {
     
@@ -237,7 +237,9 @@ WYPhotoViewCellDelegate
 //        _photoDesView.textContainer.lineFragmentPadding = 0;
         _photoDesView.showsHorizontalScrollIndicator = NO;
         _photoDesView.showsVerticalScrollIndicator = YES;
+        _photoDesView.alwaysBounceVertical = YES;
         _photoDesView.layoutManager.allowsNonContiguousLayout = NO;
+        _photoDesView.indicatorStyle = UIScrollViewIndicatorStyleWhite;
 //        _photoDesView.selectable = NO;
     }
     return _photoDesView;
