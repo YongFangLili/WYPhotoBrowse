@@ -17,6 +17,14 @@ typedef NS_ENUM(NSUInteger, eWYPhotoBrowseType) {
     eWYPhotoBrowseSave = 2,
 };
 
+typedef NS_ENUM(NSUInteger, eWYPhotoBrowseInteractiveType) {
+    
+    // 通过关闭按钮关闭页面
+    eWYPhotoBrowseInteractiveCloseByButtonType = 1,
+    // 通过手势点击进行关闭
+    eWYPhotoBrowseInteractiveCloseByGestureClickType = 2,
+};
+
 @protocol WYPhotoBrowseControllerDelegate <NSObject>
 
 @optional
@@ -37,5 +45,8 @@ typedef NS_ENUM(NSUInteger, eWYPhotoBrowseType) {
 
 /** 浏览类型 */
 @property (nonatomic, assign) eWYPhotoBrowseType browseType;
+
+/** 关闭的交互类型 */
+@property (nonatomic, assign) eWYPhotoBrowseInteractiveType InteractiveType;
 
 @end

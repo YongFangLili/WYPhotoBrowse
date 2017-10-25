@@ -53,7 +53,8 @@ static NSString * image9 = @"https://img05.allinmd.cn/public1/M00/43/66/ooYBAFho
         model.photoDes= @"jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看";
         [browseVC.dataArray addObject:model];
     }
-    [self.navigationController pushViewController:browseVC animated:YES];
+    [self presentViewController:browseVC animated:YES completion:nil];
+//    [self.navigationController pushViewController:browseVC animated:YES];
 }
 
 - (void)didReceiveMemoryWarning {

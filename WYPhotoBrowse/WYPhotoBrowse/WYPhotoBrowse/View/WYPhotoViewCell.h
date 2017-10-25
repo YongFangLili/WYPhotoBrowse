@@ -22,6 +22,9 @@
 /** 模型 */
 @property (nonatomic, strong) WYPhotoBrowseModel *model;
 
+/** 图片 */
+@property (nonatomic, strong) UIImageView *imageView;
+
 /** 代理 */
 @property (nonatomic, weak)id<WYPhotoViewCellDelegate>delegate;
 

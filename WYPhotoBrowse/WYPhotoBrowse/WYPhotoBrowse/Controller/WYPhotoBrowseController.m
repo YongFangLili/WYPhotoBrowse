@@ -8,11 +8,14 @@
 
 #import "WYPhotoBrowseController.h"
 #import "WYPhotoViewCell.h"
+#import "WYPhotoBrowseTransition.h"
+
 #define kDesphotoViewWidth ([UIScreen mainScreen].bounds.size.width - 15 - 15)
 static NSString *kPhotoCellIdentifier = @"photoCellIdentifier";
 @interface WYPhotoBrowseController ()
 <UICollectionViewDelegate,
 UICollectionViewDataSource,
+UIGestureRecognizerDelegate,
 UITextViewDelegate,
 WYPhotoViewCellDelegate
 >
@@ -29,6 +32,14 @@ WYPhotoViewCellDelegate
 @property (nonatomic, strong) UILabel *pageLable;
 /** title */
 @property (nonatomic, strong) UILabel *titleLable;
+/** 转场动画 */
+@property (nonatomic, strong) WYPhotoBrowseTransition *animatedTransition;
+/** 图片的中心 */
+@property (nonatomic, assign) CGPoint transitionImgViewCenter;
+/** topView的中心 */
+@property (nonatomic, assign) CGPoint transitionTopViewCenter;
+/** 底部view的中心 */
+@property (nonatomic, assign) CGPoint transitionBottomViewCenter;
  @end
 
 @implementation WYPhotoBrowseController
@@ -40,6 +51,7 @@ WYPhotoViewCellDelegate
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     self.view.backgroundColor = [UIColor whiteColor];
     [self setUpUI];
+    [self addPanGesture];
     
 }
 
@@ -87,6 +99,86 @@ WYPhotoViewCellDelegate
     [self.bottomView addSubview:self.photoDesView];
     [self updatePageDes];
 }
+
+- (void)addPanGesture {
+    
+    // 创建转场手势
+//    if (self.navigationController.topViewController != self) {
+        UIPanGestureRecognizer *interactiveTransitionRecognizer;
+        interactiveTransitionRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(interactiveTransitionRecognizerAction:)];
+        [self.view addGestureRecognizer:interactiveTransitionRecognizer];
+//    }
+}
+
+- (void)interactiveTransitionRecognizerAction:(UIPanGestureRecognizer *)gestureRecognizer {
+    
+    // 获取当前的cell
+    CGPoint translation = [gestureRecognizer translationInView:gestureRecognizer.view];
+    WYPhotoViewCell*cell =(WYPhotoViewCell *) [self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:self.currentIndex inSection:0]];
+    
+    CGFloat scale = 1 - fabs(translation.y / [UIScreen mainScreen].bounds.size.height);
+    scale = scale < 0.2 ? 0.2 : scale;
+    
+    switch (gestureRecognizer.state) {
+        case UIGestureRecognizerStatePossible:
+            break;
+        case UIGestureRecognizerStateBegan:{
+            
+            //1. 设置代理
+            //            self.animatedTransition = nil;
+            
+            self.transitioningDelegate = self.animatedTransition;
+            self.transitionImgViewCenter = cell.imageView.center;
+            self.transitionBottomViewCenter = self.bottomView.center;
+            self.animatedTransition.gestureRecognizer = gestureRecognizer;
+            self.transitionTopViewCenter = self.topView.center;
+            
+            //3.dismiss
+            [self dismissViewControllerAnimated:YES completion:nil];
+            self.animatedTransition.beforeImageViewFrame = [self backScreenImageViewRectWithImage:cell.imageView.image];
+        }
+            break;
+        case UIGestureRecognizerStateChanged: {
+            
+            cell.imageView.center = CGPointMake(cell.imageView.center.x, self.transitionImgViewCenter.y + translation.y);
+            
+            if (cell.imageView.center.y >= self.transitionImgViewCenter.y && translation.y >= 0) {
+                
+                self.bottomView.center = CGPointMake(self.bottomView.center.x, self.transitionBottomViewCenter.y + translation.y);
+                self.topView.center = CGPointMake(self.bottomView.center.x, self.transitionTopViewCenter.y - translation.y);
+                
+            }else {
+                self.bottomView.center = CGPointMake(self.bottomView.center.x, self.transitionBottomViewCenter.y - translation.y);
+                self.topView.center = CGPointMake(self.topView.center.x, self.transitionTopViewCenter.y +translation.y);
+            }
+            
+        }
+            break;
+        case UIGestureRecognizerStateFailed:
+        case UIGestureRecognizerStateCancelled:
+        case UIGestureRecognizerStateEnded: {
+            
+            if (scale > 0.8f) {
+                [UIView animateWithDuration:0.2 animations:^{
+                    // 重置位置
+                    cell.imageView.center = self.transitionImgViewCenter;
+                    cell.imageView.alpha = 1.0;
+                    cell.imageView.transform = CGAffineTransformMakeScale(1, 1);
+                    self.bottomView.center = self.transitionBottomViewCenter;
+                    self.topView.center = self.transitionTopViewCenter;
+                } completion:^(BOOL finished) {
+                }];
+            }else{
+                
+            }
+            self.animatedTransition.currentImage = cell.imageView.image;
+            CGRect originFrame = [self backScreenImageViewRectWithImage:cell.imageView.image];
+            self.animatedTransition.currentImageViewFrame = CGRectMake(originFrame.origin.x ,cell.imageView.center.y - originFrame.size.height / 2,originFrame.size.width, originFrame.size.height);
+            self.animatedTransition.gestureRecognizer = nil;
+        }
+    }
+}
+
 
 #pragma mark - private method
 - (void)updatePageDes {
@@ -180,21 +272,65 @@ WYPhotoViewCellDelegate
     return NO;
 }
 
-////textView滚动条是否显示
-//- (void)textViewCursorIsHidden:(BOOL) isHidden {
-//    // && img.autoresizingMask == UIViewAutoresizingNone
-//    for(UIView *img in [self.photoDesView subviews]) {
-//        if ([img isKindOfClass:[UIImageView class]] ){
-//            img.backgroundColor = [UIColor redColor];
-//            [img setAlpha:1.0];
-//        }
-//    }
-//}
-
 - (void)clickSingleGesture {
     
-    // 隐藏动画
+    // 隐藏动画 （如果）
+    switch (self.InteractiveType) {
+            // button点击类型  隐藏
+        case eWYPhotoBrowseInteractiveCloseByButtonType:
+        {
+            // 头部和底部隐藏
+            [UIView animateWithDuration:0.35 animations:^{
+                self.bottomView.alpha = 1.0 - self.bottomView.alpha;
+                self.topView.alpha = 1.0 - self.bottomView.alpha;
+            }];
+        }
+            
+            break;
+            // 手势点击关闭
+        case eWYPhotoBrowseInteractiveCloseByGestureClickType:
+        {
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+            
+            break;
+            
+        default:
+            break;
+    }
 }
+
+
+//返回imageView在window上全屏显示时的frame
+- (CGRect)backScreenImageViewRectWithImage:(UIImage *)image {
+    
+    CGFloat imageScale = image.size.height / image.size.width;
+    CGFloat screenScale = [UIScreen mainScreen].bounds.size.height / [UIScreen mainScreen].bounds.size.width;
+    CGFloat afterHeight = 0;
+    CGFloat afterWidth = 0;
+    CGFloat afterleft = 0;
+    CGFloat afterTop = 0;
+    if (imageScale > screenScale) { // 长图
+        
+        afterHeight = [UIScreen mainScreen].bounds.size.height;
+        afterWidth = afterHeight/imageScale;
+        afterleft = ([UIScreen mainScreen].bounds.size.width - afterWidth) / 2;
+        afterTop = 0;
+        
+        
+    }else { // 短图
+        afterWidth = [UIScreen mainScreen].bounds.size.width;
+        afterHeight = [UIScreen mainScreen].bounds.size.width * imageScale;
+        afterleft = 0;
+        afterTop = ([UIScreen mainScreen].bounds.size.height - afterHeight) / 2;
+        
+    }
+    
+    return CGRectMake(afterleft, afterTop, afterWidth, afterHeight);
+}
+
+
+
 
 #pragma mark - lazy
 - (UICollectionView *)collectionView {
@@ -281,6 +417,15 @@ WYPhotoViewCellDelegate
         _dataArray = [NSMutableArray array];
     }
     return _dataArray;
+}
+
+- (WYPhotoBrowseTransition *)animatedTransition {
+    
+    if (!_animatedTransition) {
+        _animatedTransition = [[WYPhotoBrowseTransition alloc] init];
+    }
+    return _animatedTransition;
+
 }
 
 @end

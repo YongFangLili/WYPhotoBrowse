@@ -12,8 +12,7 @@
 
 @interface WYPhotoViewCell ()<UIScrollViewDelegate,UIGestureRecognizerDelegate>
 
-/** 图片 */
-@property (nonatomic, strong) UIImageView *imageView;
+
 
 /** UIScrollView */
 @property (nonatomic, strong) UIScrollView *scrollView;
