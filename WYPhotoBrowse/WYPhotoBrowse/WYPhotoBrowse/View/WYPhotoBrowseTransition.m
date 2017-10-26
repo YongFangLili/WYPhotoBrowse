@@ -24,59 +24,6 @@
 
 @implementation WYPhotoBrowseTransition
 
-/** 转场过渡的图片 */
-- (void)setTransitionImage:(UIImage *)transitionImage {
-    
-    self.customPush.transitionImage = transitionImage;
-    self.customPop.transitionImage = transitionImage;
-}
-
-/** 转场前的图片frame */
-- (void)setTransitionBeforeImgFrame:(CGRect)frame {
-    
-    self.customPop.transitionBeforeImgFrame = frame;
-    self.customPush.transitionBeforeImgFrame = frame;
-    self.percentIntractive.beforeImageViewFrame = frame;
-}
-
-/** 转场后的图片frame */
-- (void)setTransitionAfterImgFrame:(CGRect)frame {
-    
-    self.customPush.transitionAfterImgFrame = frame;
-    self.customPop.transitionAfterImgFrame = frame;
-}
-
-- (void)setTransitionImageUrl:(NSString *)transitionImgaeUrl {
-    
-    self.customPush.transitionImageUrl = transitionImgaeUrl;
-}
-
-- (void)setIsFadToShow:(BOOL)isFadToShow {
-    
-    _isFadToShow = isFadToShow;
-    self.customPush.isFadToShow = isFadToShow;
-}
-
--(void)setBeforeImageViewFrame:(CGRect)beforeImageViewFrame {
-    
-    beforeImageViewFrame = [self imageScreenWithImageFrame:beforeImageViewFrame];
-    _beforeImageViewFrame = beforeImageViewFrame;
-    self.percentIntractive.beforeImageViewFrame = beforeImageViewFrame;
-}
-- (void)setCurrentImageViewFrame:(CGRect)currentImageViewFrame {
-    
-    //    currentImageViewFrame = [self imageScreenWithImageFrame:currentImageViewFrame];
-    _currentImageViewFrame = currentImageViewFrame;
-    self.percentIntractive.currentImageViewFrame = currentImageViewFrame;
-}
-
-- (void)setCurrentImage:(UIImage *)currentImage {
-    
-    _currentImage = currentImage;
-    
-    self.percentIntractive.currenttransitionImage = currentImage;
-}
-
 - (nullable id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source{
     
     //动画执行者和 nav中一样,故此处不再重写，直接调用之前navigation中的创建好的类
@@ -89,7 +36,7 @@
     return self.customPop;
 }
 
-- (nullable id <UIViewControllerInteractiveTransitioning>)interactionControllerForDismissal:(id <UIViewControllerAnimatedTransitioning>)animator{
+- (nullable id <UIViewControllerInteractiveTransitioning>)interactionControllerForDismissal:(id <UIViewControllerAnimatedTransitioning>)animator {
     
     if (self.gestureRecognizer){
         return self.percentIntractive;
@@ -99,12 +46,50 @@
     }
 }
 
+#pragma mark - getters && setters
+- (void)setTransitionImageUrl:(NSString *)transitionImgaeUrl {
+    
+    self.customPush.transitionImageUrl = transitionImgaeUrl;
+}
+
+- (void)setIsFadToShow:(BOOL)isFadToShow {
+    
+    _isFadToShow = isFadToShow;
+    self.customPush.isFadToShow = isFadToShow;
+}
+
+- (void)setTransitionBeforeImageFrame:(CGRect)transitionBeforeImageFrame {
+
+    self.customPop.transitionBeforeImgFrame = transitionBeforeImageFrame;
+    self.customPush.transitionBeforeImgFrame = transitionBeforeImageFrame;
+    
+    transitionBeforeImageFrame = [self imageScreenWithImageFrame:transitionBeforeImageFrame];
+    _transitionBeforeImageFrame = transitionBeforeImageFrame;
+    self.percentIntractive.beforeImageViewFrame = transitionBeforeImageFrame;
+}
+
+- (void)setTransitionAfterImgFrame:(CGRect)transitionAfterImgFrame {
+    
+    _transitionAfterImgFrame = transitionAfterImgFrame;
+    self.customPush.transitionAfterImgFrame = transitionAfterImgFrame;
+    self.customPop.transitionAfterImgFrame = transitionAfterImgFrame;
+    self.percentIntractive.afterImageViewFrame = transitionAfterImgFrame;
+}
+
+- (void)setTransitionImage:(UIImage *)transitionImage {
+    
+    _transitionImage = transitionImage;
+    self.percentIntractive.currenttransitionImage = transitionImage;
+    self.customPush.transitionImage = transitionImage;
+    self.customPop.transitionImage = transitionImage;
+}
+
 - (WYPhotoBrowseDrivenInteractive *)percentIntractive{
+    
     if (!_percentIntractive) {
         _percentIntractive = [[WYPhotoBrowseDrivenInteractive alloc] initWithGestureRecognizer:self.gestureRecognizer];
     }
     return _percentIntractive;
-    
 }
 
 - (WYPhotoBrowseTransitionPop *)customPop{
@@ -126,6 +111,7 @@
 - (CGRect)imageScreenWithImageFrame:(CGRect)imageFrame {
     
     CGFloat imageScale = imageFrame.size.height / imageFrame.size.width;
+    imageScale = isnan(imageScale) ? 0 : imageScale;
     CGFloat screenScale = [UIScreen mainScreen].bounds.size.height / [UIScreen mainScreen].bounds.size.width;
     CGFloat afterHeight = 0;
     CGFloat afterWidth = 0;
@@ -145,5 +131,6 @@
     }
     return CGRectMake(afterleft, afterTop, afterWidth, afterHeight);
 }
+
 
 @end

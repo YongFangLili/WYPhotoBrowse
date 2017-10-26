@@ -31,7 +31,8 @@ typedef NS_ENUM(NSUInteger, eWYPhotoBrowseInteractiveType) {
 - (void)wyPhotoBrowseControllerLoadView;
 - (void)wyPhotoBrowseControllerViewWillAppear;
 - (void)wyPhotoBrowseControllerViewWillDissAppear;
-- (void)ClickwyPhotoBrowseRightBtn;
+- (void)ClickwyPhotoBrowseRightBtnWitheWYPhotoBrowseType:(eWYPhotoBrowseType *)BrowseType;
+- (void)deletePhotoSucessfull;
 
 @end
 

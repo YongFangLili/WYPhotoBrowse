@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "WYPhotoBrowseController.h"
+#import "WYPhotoBrowseTransition.h"
 
 static NSString * image1 = @"https://img05.allinmd.cn/public1/M00/0C/6F/wKgBMFnlnPKAbIlYAAh4agFLOQA317_c_t_225_150.JPG";
 static NSString * image2 = @"https://img05.allinmd.cn/public1/M00/0C/71/wKgBL1nlnPOAEyVqAAJIU7ZUZkQ572_c_t_225_150.PNG";
@@ -23,6 +24,8 @@ static NSString * image9 = @"https://img05.allinmd.cn/public1/M00/43/66/ooYBAFho
 
 @property (nonatomic, strong) UIButton *button;
 
+@property (nonatomic, strong) WYPhotoBrowseTransition *transition;
+
 @end
 
 @implementation ViewController
@@ -36,6 +39,7 @@ static NSString * image9 = @"https://img05.allinmd.cn/public1/M00/43/66/ooYBAFho
     self.button.backgroundColor = [UIColor redColor];
     [self.button setTitle:@"预览大图" forState:UIControlStateNormal];
     [self.button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.button setImage:[UIImage imageNamed:@"u0-1"] forState:UIControlStateNormal];
     [self.button addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.button];
 }
@@ -53,13 +57,16 @@ static NSString * image9 = @"https://img05.allinmd.cn/public1/M00/43/66/ooYBAFho
         model.photoDes= @"jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看";
         [browseVC.dataArray addObject:model];
     }
+    self.transition = [[WYPhotoBrowseTransition alloc] init];
+    self.transition.transitionImage = self.button.imageView.image;
+    self.transition.transitionBeforeImageFrame = self.button.frame;
+    self.transition.transitionAfterImgFrame = [self.transition imageScreenWithImageFrame:self.button.imageView.bounds];
+    self.transition.isFadToShow = YES;
+    browseVC.currentIndex = 1;
+    browseVC.InteractiveType = eWYPhotoBrowseInteractiveCloseByButtonType;
+    browseVC.browseType = eWYPhotoBrowseDelete;
+    browseVC.transitioningDelegate = self.transition;
     [self presentViewController:browseVC animated:YES completion:nil];
-//    [self.navigationController pushViewController:browseVC animated:YES];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 

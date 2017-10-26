@@ -54,7 +54,6 @@ WYPhotoViewCellDelegate
     self.automaticallyAdjustsScrollViewInsets = NO;
     [self setUpUI];
     [self addPanGesture];
-    
 }
 
 - (void)setUpUI {
@@ -100,6 +99,7 @@ WYPhotoViewCellDelegate
     [self.bottomView addSubview:self.pageLable];
     [self.bottomView addSubview:self.photoDesView];
     [self updatePageDes];
+    
 }
 
 - (void)addPanGesture {
@@ -109,8 +109,7 @@ WYPhotoViewCellDelegate
         UIPanGestureRecognizer *interactiveTransitionRecognizer;
         interactiveTransitionRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(interactiveTransitionRecognizerAction:)];
         [self.view addGestureRecognizer:interactiveTransitionRecognizer];
-        self.animatedTransition.gestureRecognizer = interactiveTransitionRecognizer;
-        self.transitioningDelegate = self.animatedTransition;
+    
 //    }
 }
 
@@ -127,17 +126,16 @@ WYPhotoViewCellDelegate
         case UIGestureRecognizerStatePossible:
             break;
         case UIGestureRecognizerStateBegan:{
-            
             //1. 设置代理
+            self.animatedTransition.gestureRecognizer = gestureRecognizer;
             self.transitioningDelegate = self.animatedTransition;
             self.transitionImgViewCenter = cell.imageView.center;
             self.transitionBottomViewCenter = self.bottomView.center;
-            
             self.transitionTopViewCenter = self.topView.center;
             
             //3.dismiss
             [self dismissViewControllerAnimated:YES completion:nil];
-            self.animatedTransition.beforeImageViewFrame = [self backScreenImageViewRectWithImage:cell.imageView.image];
+            self.animatedTransition.transitionBeforeImageFrame = [self backScreenImageViewRectWithImage:cell.imageView.image];
         }
             break;
         case UIGestureRecognizerStateChanged: {
@@ -167,19 +165,16 @@ WYPhotoViewCellDelegate
                     self.topView.center = self.transitionTopViewCenter;
                     
                 } completion:^(BOOL finished) {
-//                    self.animatedTransition = nil;
+                    self.animatedTransition.gestureRecognizer = nil;
                 }];
             }else{
                 
                 // UIWindow * window=[[[UIApplication sharedApplication] delegate] window];
                 // CGRect rect=[cell.productImage convertRect: cell.productImage.bounds toView:window];
-                
-                CGRect originFrame = [self backScreenImageViewRectWithImage:cell.imageView.image];
-                self.animatedTransition.currentImage = cell.imageView.image;
-                self.animatedTransition.currentImageViewFrame = CGRectMake(originFrame.origin.x ,cell.imageView.center.y - originFrame.size.height / 2,originFrame.size.width, originFrame.size.height);
-                //self.animatedTransition.gestureRecognizer = nil;
-                
             }
+            CGRect originFrame = [self backScreenImageViewRectWithImage:cell.imageView.image];
+            self.animatedTransition.transitionImage = cell.imageView.image;
+            self.animatedTransition.transitionAfterImgFrame = CGRectMake(originFrame.origin.x ,cell.imageView.center.y - originFrame.size.height / 2,originFrame.size.width, originFrame.size.height);
         }
     }
 }
@@ -211,35 +206,73 @@ WYPhotoViewCellDelegate
     [attributeStr setAttributes:attributeDic range:NSMakeRange(0, attributeStr.length)];
     CGFloat desViewHeight = [model.photoDes boundingRectWithSize:CGSizeMake(kDesphotoViewWidth,MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:attributeDic context:nil].size.height;
     desViewHeight = desViewHeight > (4 * 13 + 4 * 4 + 13 + 13/2) ? (4 * 13 + 4 * 4 + 13 + 13/2) : desViewHeight;
-    
-    
     self.photoDesView.attributedText = attributeStr;
-    
     CGFloat bottomViewHeight = (15 + 30) + desViewHeight;
     self.bottomView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height -  bottomViewHeight, [UIScreen mainScreen].bounds.size.width, bottomViewHeight);
     self.pageLable.frame = CGRectMake(0, bottomViewHeight - 30, [UIScreen mainScreen].bounds.size.width, 30);
     self.photoDesView.frame = CGRectMake(15, 15, kDesphotoViewWidth, desViewHeight);
-//    [self textViewCursorIsHidden:1];
+    [self.collectionView setContentOffset:CGPointMake(self.currentIndex *([UIScreen mainScreen].bounds.size.width), 0)];
 }
 
 #pragma mark - click Mehod
 - (void)clickCloseBtn:(UIButton *)btn {
-
-    [self. navigationController popViewControllerAnimated:YES];
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)clickRightBtn:(UIButton *)btn {
     
     switch (self.browseType) {
         case eWYPhotoBrowseSave:
-            
             break;
         case eWYPhotoBrowseDelete:
-            
+            [self deletePhotoSucessfull];
             break;
         default:
             break;
     }
+}
+
+- (void)savePhoto {
+
+    // 保存相册
+}
+
+- (void)deletePhotoSucessfull {
+    
+    [self upDateData];
+
+    
+}
+
+
+/**
+ * @brief 删除成功后，移除删除的model
+ */
+- (void)upDateData {
+    
+    WYPhotoBrowseModel *model = self.dataArray[self.currentIndex];
+    
+    if ([self.dataArray containsObject:model]) {
+        /// 被删除的下标.
+        NSInteger index = [self.dataArray indexOfObject:model];
+//        [[NSNotificationCenter defaultCenter] postNotificationName:kProductAtlasDeletedNotification object:@(index)];
+        [self.dataArray removeObject:model];
+    }
+    
+    if (self.dataArray.count == 0) {
+        // 刷新图集数据
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            
+            [self dismissViewControllerAnimated:YES completion:nil];
+        });
+        return;
+    }
+    if (self.currentIndex >= self.dataArray.count) {
+        self.currentIndex = self.dataArray.count -1;
+    }
+    [self.collectionView reloadData];
+    [self updatePageDes];
 }
 
 #pragma mark - collectionDataSource & collectionDelegate
@@ -267,7 +300,6 @@ WYPhotoViewCellDelegate
     if ([scrollView isEqual:self.photoDesView]) return;
     NSInteger index = scrollView.contentOffset.x / [UIScreen mainScreen].bounds.size.width;
     self.currentIndex = index;
-//     [self textViewCursorIsHidden:1];
     // 更新页码与详情
     [self updatePageDes];
 }
@@ -284,57 +316,69 @@ WYPhotoViewCellDelegate
             // button点击类型  隐藏
         case eWYPhotoBrowseInteractiveCloseByButtonType:
         {
-            // 头部和底部隐藏
-            [UIView animateWithDuration:0.35 animations:^{
-                self.bottomView.alpha = 1.0 - self.bottomView.alpha;
-                self.topView.alpha = 1.0 - self.bottomView.alpha;
-            }];
+            [self hideTopAndBottomView];
         }
-            
             break;
             // 手势点击关闭
         case eWYPhotoBrowseInteractiveCloseByGestureClickType:
         {
             [self.navigationController popViewControllerAnimated:YES];
         }
-            
             break;
             
         default:
+            [self dismissViewControllerAnimated:YES completion:nil];
             break;
     }
 }
 
 
-//返回imageView在window上全屏显示时的frame
+/**
+ * @brief 隐藏头部与底部视图
+ */
+- (void)hideTopAndBottomView {
+
+    [UIView animateWithDuration:(0.25) animations:^{
+        
+        if (self.topView.frame.origin.y < 0) {
+            self.topView.frame = CGRectMake(self.topView.frame.origin.x,0 , self.topView.bounds.size.width, self.topView.bounds.size.height);
+            self.bottomView.frame = CGRectMake(self.bottomView.frame.origin.x, [UIScreen mainScreen].bounds.size.height - self.bottomView.bounds.size.height, self.bottomView.bounds.size.width, self.bottomView.bounds.size.height);
+        }else {
+            self.topView.frame = CGRectMake(self.topView.frame.origin.x,-self.topView.bounds.size.height, self.topView.bounds.size.width, self.topView.bounds.size.height);
+             self.bottomView.frame = CGRectMake(self.bottomView.frame.origin.x, [UIScreen mainScreen].bounds.size.height, self.bottomView.bounds.size.width, self.bottomView.bounds.size.height);
+        }
+    }];
+}
+/**
+ * @brief 图片在整个屏幕的位置
+ */
 - (CGRect)backScreenImageViewRectWithImage:(UIImage *)image {
     
-    CGFloat imageScale = image.size.height / image.size.width;
-    CGFloat screenScale = [UIScreen mainScreen].bounds.size.height / [UIScreen mainScreen].bounds.size.width;
-    CGFloat afterHeight = 0;
-    CGFloat afterWidth = 0;
-    CGFloat afterleft = 0;
-    CGFloat afterTop = 0;
-    if (imageScale > screenScale) { // 长图
+    if (image) {
         
-        afterHeight = [UIScreen mainScreen].bounds.size.height;
-        afterWidth = afterHeight/imageScale;
-        afterleft = ([UIScreen mainScreen].bounds.size.width - afterWidth) / 2;
-        afterTop = 0;
-        
-        
-    }else { // 短图
-        afterWidth = [UIScreen mainScreen].bounds.size.width;
-        afterHeight = [UIScreen mainScreen].bounds.size.width * imageScale;
-        afterleft = 0;
-        afterTop = ([UIScreen mainScreen].bounds.size.height - afterHeight) / 2;
-        
+        CGFloat imageScale = image.size.height / image.size.width;
+        imageScale = isnan(imageScale) ? 0 : imageScale;
+        CGFloat screenScale = [UIScreen mainScreen].bounds.size.height / [UIScreen mainScreen].bounds.size.width;
+        CGFloat afterHeight = 0;
+        CGFloat afterWidth = 0;
+        CGFloat afterleft = 0;
+        CGFloat afterTop = 0;
+        if (imageScale > screenScale) { // 长图
+            
+            afterHeight = [UIScreen mainScreen].bounds.size.height;
+            afterWidth = afterHeight/imageScale;
+            afterleft = ([UIScreen mainScreen].bounds.size.width - afterWidth) / 2;
+            afterTop = 0;
+        }else { // 短图
+            afterWidth = [UIScreen mainScreen].bounds.size.width;
+            afterHeight = [UIScreen mainScreen].bounds.size.width * imageScale;
+            afterleft = 0;
+            afterTop = ([UIScreen mainScreen].bounds.size.height - afterHeight) / 2;
+        }
+        return CGRectMake(afterleft, afterTop, afterWidth, afterHeight);
     }
-    
-    return CGRectMake(afterleft, afterTop, afterWidth, afterHeight);
+    return CGRectZero;
 }
-
-
 
 
 #pragma mark - lazy

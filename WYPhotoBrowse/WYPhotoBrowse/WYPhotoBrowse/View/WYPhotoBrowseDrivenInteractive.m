@@ -59,8 +59,8 @@
             
         case UIGestureRecognizerStateBegan:
 
+            break;
         case UIGestureRecognizerStateChanged:
-            
             [self updateInteractiveTransition:[self percentForGesture:gestureRecognizer]];
             [self updateInterPercent:[self percentForGesture:gestureRecognizer]];
             break;
@@ -93,10 +93,8 @@
 - (void)beginInterPercent {
     
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
-    
     //转场过渡的容器view
     UIView *containerView = [transitionContext containerView];
-    
     //ToVC
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     UIView *toView = toViewController.view;
@@ -106,10 +104,8 @@
     _blackBgView = [[UIView alloc] initWithFrame:containerView.bounds];
     _blackBgView.backgroundColor = [UIColor blackColor];
     [containerView addSubview:_blackBgView];
-    
     //FromVC
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    
     UIView *fromView = fromViewController.view;
     fromView.backgroundColor = [UIColor clearColor];
     [containerView addSubview:fromView];
@@ -165,7 +161,7 @@
     UIImageView *transitionImgView = [[UIImageView alloc] initWithImage:self.currenttransitionImage];
     transitionImgView.clipsToBounds = YES;
     transitionImgView.contentMode = UIViewContentModeScaleAspectFit;
-    transitionImgView.frame = self.currentImageViewFrame;
+    transitionImgView.frame = self.afterImageViewFrame;
     [containerView addSubview:transitionImgView];
     CGRect offsetFrame = CGRectZero;
     if (scale > 0.8) {
@@ -173,9 +169,9 @@
     }else {
         // 手势结束后，判断手势y值与转场前的frame做对比,大于则小时在底部，小于则消失在底部
         if ((transitionImgView.frame.origin.y > self.beforeImageViewFrame.origin.y) > 0) {
-            offsetFrame = CGRectMake(self.currentImageViewFrame.origin.x, [UIScreen mainScreen].bounds.size.height, self.currentImageViewFrame.size.width,self.currentImageViewFrame.size.height);
+            offsetFrame = CGRectMake(self.afterImageViewFrame.origin.x, [UIScreen mainScreen].bounds.size.height, self.afterImageViewFrame.size.width,self.afterImageViewFrame.size.height);
         }else {
-            offsetFrame = CGRectMake(self.currentImageViewFrame.origin.x, -self.currentImageViewFrame.size.height, self.currentImageViewFrame.size.width,self.currentImageViewFrame.size.height);
+            offsetFrame = CGRectMake(self.afterImageViewFrame.origin.x, -self.afterImageViewFrame.size.height, self.afterImageViewFrame.size.width,self.afterImageViewFrame.size.height);
         }
     }
     

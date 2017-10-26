@@ -16,11 +16,10 @@
  * @parame gestureRecognizer 手势
  */
 - (instancetype)initWithGestureRecognizer:(UIPanGestureRecognizer*)gestureRecognizer;
-
 /** 转场前的图片frame */
 @property (nonatomic, assign) CGRect     beforeImageViewFrame;
 /** 当前图片的frame */
-@property (nonatomic, assign) CGRect     currentImageViewFrame;
+@property (nonatomic, assign) CGRect    afterImageViewFrame;
 /** 当前转场的图片 */
 @property (nonatomic, strong) UIImage    *currenttransitionImage;
 /**交互式转场手势 */
