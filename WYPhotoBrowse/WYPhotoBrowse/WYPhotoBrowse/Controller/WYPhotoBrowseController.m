@@ -9,6 +9,7 @@
 #import "WYPhotoBrowseController.h"
 #import "WYPhotoViewCell.h"
 #import "WYPhotoBrowseTransition.h"
+#import "WYPhotoBrowseDrivenInteractive.h"
 
 #define kDesphotoViewWidth ([UIScreen mainScreen].bounds.size.width - 15 - 15)
 static NSString *kPhotoCellIdentifier = @"photoCellIdentifier";
@@ -49,7 +50,8 @@ WYPhotoViewCellDelegate
     [super viewDidLoad];
     self.automaticallyAdjustsScrollViewInsets = NO; 
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-    self.view.backgroundColor = [UIColor whiteColor];
+    self.view.backgroundColor = [UIColor blackColor];
+    self.automaticallyAdjustsScrollViewInsets = NO;
     [self setUpUI];
     [self addPanGesture];
     
@@ -107,6 +109,8 @@ WYPhotoViewCellDelegate
         UIPanGestureRecognizer *interactiveTransitionRecognizer;
         interactiveTransitionRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(interactiveTransitionRecognizerAction:)];
         [self.view addGestureRecognizer:interactiveTransitionRecognizer];
+        self.animatedTransition.gestureRecognizer = interactiveTransitionRecognizer;
+        self.transitioningDelegate = self.animatedTransition;
 //    }
 }
 
@@ -125,12 +129,10 @@ WYPhotoViewCellDelegate
         case UIGestureRecognizerStateBegan:{
             
             //1. 设置代理
-            //            self.animatedTransition = nil;
-            
             self.transitioningDelegate = self.animatedTransition;
             self.transitionImgViewCenter = cell.imageView.center;
             self.transitionBottomViewCenter = self.bottomView.center;
-            self.animatedTransition.gestureRecognizer = gestureRecognizer;
+            
             self.transitionTopViewCenter = self.topView.center;
             
             //3.dismiss
@@ -141,17 +143,14 @@ WYPhotoViewCellDelegate
         case UIGestureRecognizerStateChanged: {
             
             cell.imageView.center = CGPointMake(cell.imageView.center.x, self.transitionImgViewCenter.y + translation.y);
-            
             if (cell.imageView.center.y >= self.transitionImgViewCenter.y && translation.y >= 0) {
                 
                 self.bottomView.center = CGPointMake(self.bottomView.center.x, self.transitionBottomViewCenter.y + translation.y);
                 self.topView.center = CGPointMake(self.bottomView.center.x, self.transitionTopViewCenter.y - translation.y);
-                
             }else {
                 self.bottomView.center = CGPointMake(self.bottomView.center.x, self.transitionBottomViewCenter.y - translation.y);
                 self.topView.center = CGPointMake(self.topView.center.x, self.transitionTopViewCenter.y +translation.y);
             }
-            
         }
             break;
         case UIGestureRecognizerStateFailed:
@@ -166,15 +165,21 @@ WYPhotoViewCellDelegate
                     cell.imageView.transform = CGAffineTransformMakeScale(1, 1);
                     self.bottomView.center = self.transitionBottomViewCenter;
                     self.topView.center = self.transitionTopViewCenter;
+                    
                 } completion:^(BOOL finished) {
+//                    self.animatedTransition = nil;
                 }];
             }else{
                 
+                // UIWindow * window=[[[UIApplication sharedApplication] delegate] window];
+                // CGRect rect=[cell.productImage convertRect: cell.productImage.bounds toView:window];
+                
+                CGRect originFrame = [self backScreenImageViewRectWithImage:cell.imageView.image];
+                self.animatedTransition.currentImage = cell.imageView.image;
+                self.animatedTransition.currentImageViewFrame = CGRectMake(originFrame.origin.x ,cell.imageView.center.y - originFrame.size.height / 2,originFrame.size.width, originFrame.size.height);
+                //self.animatedTransition.gestureRecognizer = nil;
+                
             }
-            self.animatedTransition.currentImage = cell.imageView.image;
-            CGRect originFrame = [self backScreenImageViewRectWithImage:cell.imageView.image];
-            self.animatedTransition.currentImageViewFrame = CGRectMake(originFrame.origin.x ,cell.imageView.center.y - originFrame.size.height / 2,originFrame.size.width, originFrame.size.height);
-            self.animatedTransition.gestureRecognizer = nil;
         }
     }
 }
@@ -347,6 +352,7 @@ WYPhotoViewCellDelegate
         _collectionView.pagingEnabled = YES;
         _collectionView.delegate = self;
         _collectionView.dataSource = self;
+        _collectionView.backgroundColor = [UIColor clearColor];
     }
     return _collectionView;
 }

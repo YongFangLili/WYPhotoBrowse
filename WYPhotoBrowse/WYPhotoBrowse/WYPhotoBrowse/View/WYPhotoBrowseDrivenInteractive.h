@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@interface WYPhotoBrowseDrivenInteractive : UIPercentDrivenInteractiveTransition
+@interface WYPhotoBrowseDrivenInteractive : UIPercentDrivenInteractiveTransition 
 
 /**
  * @brief 初始化交互式转场
@@ -23,5 +23,7 @@
 @property (nonatomic, assign) CGRect     currentImageViewFrame;
 /** 当前转场的图片 */
 @property (nonatomic, strong) UIImage    *currenttransitionImage;
+/**交互式转场手势 */
+@property (nonatomic, strong) UIPanGestureRecognizer *gestureRecognizer;
 
 @end

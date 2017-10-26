@@ -90,6 +90,7 @@
 }
 
 - (nullable id <UIViewControllerInteractiveTransitioning>)interactionControllerForDismissal:(id <UIViewControllerAnimatedTransitioning>)animator{
+    
     if (self.gestureRecognizer){
         return self.percentIntractive;
     }
@@ -107,6 +108,7 @@
 }
 
 - (WYPhotoBrowseTransitionPop *)customPop{
+    
     if (!_customPop) {
         _customPop = [[WYPhotoBrowseTransitionPop alloc] init];
     }
@@ -135,14 +137,11 @@
         afterWidth = afterHeight/imageScale;
         afterleft = ([UIScreen mainScreen].bounds.size.width - afterWidth) / 2;
         afterTop = 0;
-        
-        
     }else { // 短图
         afterWidth = [UIScreen mainScreen].bounds.size.width;
         afterHeight = [UIScreen mainScreen].bounds.size.width * imageScale;
         afterleft = 0;
         afterTop = ([UIScreen mainScreen].bounds.size.height - afterHeight) / 2;
-        
     }
     return CGRectMake(afterleft, afterTop, afterWidth, afterHeight);
 }

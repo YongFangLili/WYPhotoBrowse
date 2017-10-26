@@ -12,9 +12,6 @@
 
 /** 转场上下文 */
 @property (nonatomic, weak) id<UIViewControllerContextTransitioning> transitionContext;
-/**交互式转场手势 */
-@property (nonatomic, strong, readonly) UIPanGestureRecognizer *gestureRecognizer;
-
 /** 交互式转场bgView */
 @property(nonatomic, strong) UIView *bgView;
 /** fromView */
@@ -38,16 +35,9 @@
     return self;
 }
 
-- (void)dealloc {
-    
-    [self.gestureRecognizer removeTarget:self action:@selector(gestureRecognizeDidUpdate:)];
-}
-
-
 - (CGFloat)percentForGesture:(UIPanGestureRecognizer *)gesture {
     
     CGPoint translation = [gesture translationInView:gesture.view];
-    
     CGFloat scale = 1 - fabs(translation.y / [UIScreen mainScreen].bounds.size.height);
     scale = scale < 0.6 ? 0.6 : scale;
     return scale;
@@ -68,21 +58,18 @@
     switch (gestureRecognizer.state) {
             
         case UIGestureRecognizerStateBegan:
-            //没用
-            break;
+
         case UIGestureRecognizerStateChanged:
             
             [self updateInteractiveTransition:[self percentForGesture:gestureRecognizer]];
             [self updateInterPercent:[self percentForGesture:gestureRecognizer]];
-            
             break;
         case UIGestureRecognizerStateEnded:
             
             if (scrale > 0.8f) {
                 [self cancelInteractiveTransition];
                 [self interPercentCancel];
-            }
-            else {
+            }else {
                 [self finishInteractiveTransition];
                 [self interPercentFinish:scrale];
             }
@@ -93,6 +80,12 @@
             break;
     }
 }
+
+- (void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
+    
+    self.transitionContext = transitionContext;
+}
+
 
 /**
  * @brief 手势开始
@@ -135,23 +128,17 @@
  * @brief 手势取消
  */
 - (void)interPercentCancel {
-    //    NSLog(@"取消");
-    
+
     id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
-    
     //转场过渡的容器view
     UIView *containerView = [transitionContext containerView];
-    
     //FromVC
     UIViewController *fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     UIView *fromView = fromViewController.view;
-    fromView.backgroundColor = [UIColor whiteColor];
+    fromView.backgroundColor = [UIColor blackColor];
     [containerView addSubview:fromView];
-    
     [_blackBgView removeFromSuperview];
-    
     _blackBgView = nil;
-    
     [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
 }
 
@@ -159,12 +146,10 @@
  * @brief 手势完成
  */
 - (void)interPercentFinish:(CGFloat)scale {
-    //    NSLog(@"完成");
-    id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
     
+    id<UIViewControllerContextTransitioning> transitionContext = self.transitionContext;
     //转场过渡的容器view
     UIView *containerView = [transitionContext containerView];
-    
     //ToVC
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     UIView *toView = toViewController.view;
@@ -188,7 +173,7 @@
     }else {
         // 手势结束后，判断手势y值与转场前的frame做对比,大于则小时在底部，小于则消失在底部
         if ((transitionImgView.frame.origin.y > self.beforeImageViewFrame.origin.y) > 0) {
-            offsetFrame = CGRectMake(self.currentImageViewFrame.origin.x, [UIScreen mainScreen].bounds.size.width, self.currentImageViewFrame.size.width,self.currentImageViewFrame.size.height);
+            offsetFrame = CGRectMake(self.currentImageViewFrame.origin.x, [UIScreen mainScreen].bounds.size.height, self.currentImageViewFrame.size.width,self.currentImageViewFrame.size.height);
         }else {
             offsetFrame = CGRectMake(self.currentImageViewFrame.origin.x, -self.currentImageViewFrame.size.height, self.currentImageViewFrame.size.width,self.currentImageViewFrame.size.height);
         }
@@ -205,16 +190,22 @@
         
         [_blackBgView removeFromSuperview];
         _blackBgView = nil;
-        //        [toView removeFromSuperview];
         [bgView removeFromSuperview];
         [transitionImgView removeFromSuperview];
         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
     }];
-    
 }
-- (void)startInteractiveTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
+
+- (void)setGestureRecognizer:(UIPanGestureRecognizer *)gestureRecognizer {
     
-    self.transitionContext = transitionContext;
+    _gestureRecognizer = gestureRecognizer;
+     [_gestureRecognizer addTarget:self action:@selector(gestureRecognizeDidUpdate:)];
+
+}
+
+- (void)dealloc {
+    
+    [self.gestureRecognizer removeTarget:self action:@selector(gestureRecognizeDidUpdate:)];
 }
 
 

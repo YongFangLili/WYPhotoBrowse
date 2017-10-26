@@ -14,7 +14,8 @@
 /**
  * @brief 转场动画的时间
  */
-- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext{
+- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
+    
     return 0.7;
 }
 
@@ -23,7 +24,6 @@
     
     //转场过渡的容器view
     UIView *containerView = [transitionContext containerView];
-    
     //ToVC
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     UIView *toView = toViewController.view;
