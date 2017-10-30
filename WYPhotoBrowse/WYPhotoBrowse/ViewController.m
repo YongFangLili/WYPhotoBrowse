@@ -20,7 +20,7 @@ static NSString * image7 = @"https://img05.allinmd.cn/public1/M00/43/66/ooYBAFho
 static NSString * image8 = @"https://img05.allinmd.cn/public1/M00/43/4A/oYYBAFho9rqARWY7AAb2QS-5kyE308_c_t_340_340.JPG";
 static NSString * image9 = @"https://img05.allinmd.cn/public1/M00/43/66/ooYBAFho9r6AfKaNAAsgCnaWsJU640_c_t_340_340.JPG";
 
-@interface ViewController ()
+@interface ViewController ()<WYPhotoBrowseControllerDelegate>
 
 @property (nonatomic, strong) UIButton *button;
 
@@ -64,10 +64,24 @@ static NSString * image9 = @"https://img05.allinmd.cn/public1/M00/43/66/ooYBAFho
     self.transition.isFadToShow = YES;
     browseVC.currentIndex = 1;
     browseVC.InteractiveType = eWYPhotoBrowseInteractiveCloseByButtonType;
-    browseVC.browseType = eWYPhotoBrowseDelete;
+    browseVC.browseType = eWYPhotoBrowseSave;
+    browseVC.delegate = self;
     browseVC.transitioningDelegate = self.transition;
     [self presentViewController:browseVC animated:YES completion:nil];
 }
 
+
+- (void)wyPhotoBrowseClickRightWithWYPhotoBrowseVC:(WYPhotoBrowseController *)browseVC {
+    
+    switch (browseVC.browseType) {
+        case eWYPhotoBrowseSave:
+            break;
+        case eWYPhotoBrowseDelete:
+            break;
+        default:
+            break;
+    }
+    [browseVC didClickRightButtonSucucess];
+}
 
 @end

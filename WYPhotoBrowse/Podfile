@@ -3,5 +3,6 @@ inhibit_all_warnings!
 source 'https://github.com/CocoaPods/Specs.git'
 target 'WYPhotoBrowse' do
 pod 'SDWebImage'
+pod 'MBProgressHUD'
 xcodeproj 'WYPhotoBrowse'
 end

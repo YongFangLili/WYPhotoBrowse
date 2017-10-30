@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "WYPhotoBrowseModel.h"
-
+@class WYPhotoBrowseController;
 typedef NS_ENUM(NSUInteger, eWYPhotoBrowseType) {
     
     // 删除
@@ -31,8 +31,7 @@ typedef NS_ENUM(NSUInteger, eWYPhotoBrowseInteractiveType) {
 - (void)wyPhotoBrowseControllerLoadView;
 - (void)wyPhotoBrowseControllerViewWillAppear;
 - (void)wyPhotoBrowseControllerViewWillDissAppear;
-- (void)ClickwyPhotoBrowseRightBtnWitheWYPhotoBrowseType:(eWYPhotoBrowseType *)BrowseType;
-- (void)deletePhotoSucessfull;
+- (void)wyPhotoBrowseClickRightWithWYPhotoBrowseVC:(WYPhotoBrowseController *)browseVC;
 
 @end
 
@@ -49,5 +48,11 @@ typedef NS_ENUM(NSUInteger, eWYPhotoBrowseInteractiveType) {
 
 /** 关闭的交互类型 */
 @property (nonatomic, assign) eWYPhotoBrowseInteractiveType InteractiveType;
+
+/** 代理 */
+@property (nonatomic, weak) id<WYPhotoBrowseControllerDelegate>delegate;
+
+
+- (void)didClickRightButtonSucucess;
 
 @end

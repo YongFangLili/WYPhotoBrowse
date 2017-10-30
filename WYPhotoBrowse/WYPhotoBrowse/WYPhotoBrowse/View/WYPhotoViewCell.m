@@ -16,9 +16,9 @@
 
 /** UIScrollView */
 @property (nonatomic, strong) UIScrollView *scrollView;
-
+/** 最小缩放 */
 @property (nonatomic, assign) CGFloat miniScale;
-
+/** 最大缩放 */
 @property (nonatomic, assign) CGFloat maxScale;
 @end
 
@@ -127,13 +127,12 @@
     _model = model;
     // 设置图片
     [self.imageView sd_setShowActivityIndicatorView:YES];
+    [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.photoImage] placeholderImage:nil];
     [self.imageView sd_setImageWithURL:[NSURL URLWithString:[model makeCImageLargeUrl]] placeholderImage:nil completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
         [self.imageView sd_setShowActivityIndicatorView:NO];
         
         if(!image) return ;
-        
         _scrollView.zoomScale = 1;
-        
         CGSize size = image.size;
         CGFloat ratio = MAX(size.width / _scrollView.frame.size.width,
                             size.height / _scrollView.frame.size.height);
@@ -187,5 +186,4 @@
     }
     return _scrollView;
 }
-
 @end

@@ -10,7 +10,6 @@
 #import "WYPhotoBrowseModel.h"
 
 @protocol WYPhotoViewCellDelegate <NSObject>
-
 /**
  * @brief 单击手势点击
  */
@@ -21,10 +20,8 @@
 @interface WYPhotoViewCell : UICollectionViewCell
 /** 模型 */
 @property (nonatomic, strong) WYPhotoBrowseModel *model;
-
 /** 图片 */
 @property (nonatomic, strong) UIImageView *imageView;
-
 /** 代理 */
 @property (nonatomic, weak)id<WYPhotoViewCellDelegate>delegate;
 

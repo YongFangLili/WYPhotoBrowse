@@ -16,6 +16,9 @@
 @property (nonatomic, copy) NSString *photoImage;
 /** 图片描述 */
 @property (nonatomic, copy) NSString *photoDes;
+/** 图片标题 */
+@property (nonatomic, copy) NSString *potoesTitle;
+
 
 /**
  *   获取图片_c地址 75%.
