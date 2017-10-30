@@ -20,7 +20,7 @@
 #define kWYLeftMargin_10 10
 #define kWYTopButtonY (kWYNavHeight - kWYTopButtonHeight)
 
-static NSString *kPhotoCellIdentifier = @"photoCellIdentifier";
+static NSString *kWYPhotoBrowseCellIdentifier = @"WY_PhotoBrowseCellIdentifier";
 @interface WYPhotoBrowseController ()
 <UICollectionViewDelegate,
 UICollectionViewDataSource,
@@ -60,6 +60,7 @@ WYPhotoViewCellDelegate
     self.automaticallyAdjustsScrollViewInsets = NO;
     [self setUpUI];
     [self addPanGesture];
+      self.animatedTransition.isFadToShow = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -92,19 +93,20 @@ WYPhotoViewCellDelegate
     // 保存或者是删除
     UIButton *rightBtn = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width - kWYLeftMargin_10 - kWYTopButtonHeight , kWYTopButtonY, kWYTopButtonHeight, kWYTopButtonHeight)];
     [rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+ [rightBtn addTarget:self action:@selector(clickRightBtn:) forControlEvents:UIControlEventTouchUpInside];
     switch (self.rightButtonType) {
         case eWYPhotoBrowseSave:
             [rightBtn setTitle:@"保存" forState:UIControlStateNormal];
+            [self.topView addSubview:rightBtn];
             break;
         case eWYPhotoBrowseDelete:
             [rightBtn setTitle:@"删除" forState:UIControlStateNormal];
+            [self.topView addSubview:rightBtn];
             break;
+        case eWYPhotoBrowseDefault:
         default:
-            [rightBtn setTitle:@"" forState:UIControlStateNormal];
             break;
     }
-    [self.topView addSubview:rightBtn];
-    [rightBtn addTarget:self action:@selector(clickRightBtn:) forControlEvents:UIControlEventTouchUpInside];
     self.titleLable.frame = CGRectMake(CGRectGetMaxX(closeBtn.frame), kWYTopButtonY, self.view.bounds.size.width - 2 *(CGRectGetMaxX(closeBtn.frame)) , kWYTopButtonHeight);
     [self.topView addSubview:self.titleLable];
     // bottomView
@@ -153,19 +155,25 @@ WYPhotoViewCellDelegate
     self.pageLable.attributedText = pageAttributeStr;
     [self.bottomView addSubview:self.pageLable];
     self.photoDesView.text  = model.photoDes;
-    self.titleLable.text = model.potoesTitle;
+    self.titleLable.text = model.photoesTitle;
     
     // 更新frame
     // 设置富文本，设置版本更显描述textView
-    NSMutableAttributedString * attributeStr = [[NSMutableAttributedString alloc]initWithString:model.photoDes];
-    NSMutableParagraphStyle * paragraph = [[NSMutableParagraphStyle alloc]init];
-    [paragraph setLineSpacing:4];//设置行间距
-    [paragraph setParagraphSpacing:5];//设置段落间距
-    NSDictionary *attributeDic = @{NSFontAttributeName:[UIFont systemFontOfSize:13],NSParagraphStyleAttributeName:paragraph,NSForegroundColorAttributeName:[UIColor whiteColor] };
-    [attributeStr setAttributes:attributeDic range:NSMakeRange(0, attributeStr.length)];
-    CGFloat desViewHeight = [model.photoDes boundingRectWithSize:CGSizeMake(kWYDesphotoViewWidth,MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:attributeDic context:nil].size.height;
-    desViewHeight = desViewHeight > (4 * 13 + 4 * 4 + 13 + 13/2) ? (4 * 13 + 4 * 4 + 13 + 13/2) : desViewHeight;
-    self.photoDesView.attributedText = attributeStr;
+    CGFloat desViewHeight = 0.0;
+    // 处理为nil的情况
+    if (!model.photoDes && model.photoDes.length == 0) {
+    }else {
+        
+        NSMutableAttributedString * attributeStr = [[NSMutableAttributedString alloc]initWithString:model.photoDes];
+        NSMutableParagraphStyle * paragraph = [[NSMutableParagraphStyle alloc]init];
+        [paragraph setLineSpacing:4];//设置行间距
+        [paragraph setParagraphSpacing:5];//设置段落间距
+        NSDictionary *attributeDic = @{NSFontAttributeName:[UIFont systemFontOfSize:13],NSParagraphStyleAttributeName:paragraph,NSForegroundColorAttributeName:[UIColor whiteColor] };
+        [attributeStr setAttributes:attributeDic range:NSMakeRange(0, attributeStr.length)];
+        desViewHeight = [model.photoDes boundingRectWithSize:CGSizeMake(kWYDesphotoViewWidth,MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:attributeDic context:nil].size.height;
+        desViewHeight = desViewHeight > (4 * 13 + 4 * 4 + 13 + 13/2) ? (4 * 13 + 4 * 4 + 13 + 13/2) : desViewHeight;
+        self.photoDesView.attributedText = attributeStr;
+    }
     CGFloat bottomViewHeight = (kWYLeftMargin_15 + kWYLeftMargin_15 * 2) + desViewHeight;
     self.bottomView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height -  bottomViewHeight, [UIScreen mainScreen].bounds.size.width, bottomViewHeight);
     self.pageLable.frame = CGRectMake(kWYLeftMargin_15, bottomViewHeight - kWYLeftMargin_15 * 2, [UIScreen mainScreen].bounds.size.width - kWYLeftMargin_15 * 2, kWYLeftMargin_15 * 2);
@@ -194,7 +202,6 @@ WYPhotoViewCellDelegate
  * @brief 保存相册
  */
 - (void)savePhoto {
-
     // 保存相册
     WYPhotoViewCell*cell =(WYPhotoViewCell *) [self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:self.currentIndex inSection:0]];
     UIImageWriteToSavedPhotosAlbum(cell.imageView.image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
@@ -229,8 +236,8 @@ WYPhotoViewCellDelegate
     
     if (view == nil) view = [UIApplication sharedApplication].keyWindow;
         [MBProgressHUD hideHUDForView:view animated:YES];
-    }
-                   
+}
+
 - (void)hideHUD {
     
     [self hideHUDForView:nil];
@@ -321,7 +328,7 @@ WYPhotoViewCellDelegate
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
 
-    WYPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kPhotoCellIdentifier forIndexPath:indexPath];
+    WYPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kWYPhotoBrowseCellIdentifier forIndexPath:indexPath];
     cell.delegate = self;
     cell.model = self.dataArray[indexPath.row];
     return cell;
@@ -346,7 +353,7 @@ WYPhotoViewCellDelegate
 - (void)clickSingleGesture {
     
     // 隐藏动画 （如果）
-    switch (self.InteractiveType) {
+    switch (self.interactiveType) {
             // button点击类型  隐藏
         case eWYPhotoBrowseInteractiveCloseByButtonType:
         {
@@ -364,6 +371,10 @@ WYPhotoViewCellDelegate
             break;
     }
 }
+
+/**
+ * @brief pan手势滑动（上下滑动image）
+ */
 - (void)interactiveTransitionRecognizerAction:(UIPanGestureRecognizer *)gestureRecognizer {
     
     // 获取当前的cell
@@ -431,7 +442,7 @@ WYPhotoViewCellDelegate
         layOut.scrollDirection = UICollectionViewScrollDirectionHorizontal;
         layOut.itemSize = CGSizeMake(self.view.bounds.size.width, self.view.bounds.size.height);
         _collectionView = [[UICollectionView alloc] initWithFrame:self.view.bounds collectionViewLayout:layOut];
-        [_collectionView registerClass:[WYPhotoViewCell class] forCellWithReuseIdentifier:kPhotoCellIdentifier];
+        [_collectionView registerClass:[WYPhotoViewCell class] forCellWithReuseIdentifier:kWYPhotoBrowseCellIdentifier];
         _collectionView.pagingEnabled = YES;
         _collectionView.delegate = self;
         _collectionView.dataSource = self;
@@ -473,7 +484,7 @@ WYPhotoViewCellDelegate
     if (!_pageLable) {
         _pageLable = [[UILabel alloc] init];
         _pageLable.textColor = [UIColor whiteColor];
-        _pageLable.textAlignment = NSTextAlignmentRight;
+        _pageLable.textAlignment = NSTextAlignmentLeft;
     }
     return _pageLable;
 }

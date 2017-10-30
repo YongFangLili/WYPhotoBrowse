@@ -10,20 +10,20 @@
 #import "WYPhotoBrowseController.h"
 #import "WYPhotoBrowseTransition.h"
 
-static NSString * image1 = @"https://img05.allinmd.cn/public1/M00/0C/6F/wKgBMFnlnPKAbIlYAAh4agFLOQA317_c_t_225_150.JPG";
-static NSString * image2 = @"https://img05.allinmd.cn/public1/M00/0C/71/wKgBL1nlnPOAEyVqAAJIU7ZUZkQ572_c_t_225_150.PNG";
-static NSString * image3 = @"https://img05.allinmd.cn/public1/M00/0C/71/wKgBL1nlnZuAG2UsAApk3mYuq_Q211_c_t_225_150.JPG";
-static NSString * image4 = @"https://img05.allinmd.cn/public1/M00/0C/6F/wKgBMFnlnZyAEb5UAAmqPCn3yZA689_c_t_225_150.JPG";
-static NSString * image5 = @"https://img05.allinmd.cn/public1/M00/0C/71/wKgBL1nlnaCAUF6SAAGrH1JzkNk682_c_t_225_150.JPG";
+static NSString * image1 = @"https://img05.allinmd.cn/public1/M00/4F/75/oYYBAFl92xCABwXJACznWq4DFrY755_c_t_340_340.jpg";
+static NSString * image2 = @"https://img05.allinmd.cn/public1/M00/4F/76/oYYBAFl93J-AT4-NAA4--0rxvV0980_c_t_340_340.jpg";
+static NSString * image3 = @"https://img05.allinmd.cn/public1/M00/4F/8F/ooYBAFl92zGAD7hTACXA6Fdztw8567_c_t_340_340.jpg";
+static NSString * image4 = @"https://img05.allinmd.cn/public1/M00/1C/1C/ooYBAFeGJTGAZrwzADyPzZ_2nV8941_c_t_340_340.jpg";
+//static NSString * image5 = @"https://img05.allinmd.cn/public1/M00/4F/75/oYYBAFl922uACNMiAEuvOTL6SXg856_c_t_340_340.jpg";
+static NSString * image5 = @"https://img05.allinmd.cn/public1/M00/14/85/ooYBAFaytAWAEGeKACcmgnGrM4M527_c_d_sp.jpg";
 static NSString * image6 = @"https://img05.allinmd.cn/public1/M00/43/4A/oYYBAFho9rSAKuSDAAQlbMiKJY8585_c_t_340_340.JPG";
 static NSString * image7 = @"https://img05.allinmd.cn/public1/M00/43/66/ooYBAFho9raACsDJAAXy3F__6lo125_c_t_340_340.JPG";
 static NSString * image8 = @"https://img05.allinmd.cn/public1/M00/43/4A/oYYBAFho9rqARWY7AAb2QS-5kyE308_c_t_340_340.JPG";
-static NSString * image9 = @"https://img05.allinmd.cn/public1/M00/43/66/ooYBAFho9r6AfKaNAAsgCnaWsJU640_c_t_340_340.JPG";
+static NSString * image9 = @"https://img05.allinmd.cn/public1/M00/14/85/ooYBAFaytBaAQycLACnbWGpy9Eo552_c_d_sp.jpg";
 
 @interface ViewController ()<WYPhotoBrowseControllerDelegate>
 
 @property (nonatomic, strong) UIButton *button;
-@property (nonatomic, strong) WYPhotoBrowseTransition *transition;
 
 @end
 
@@ -55,7 +55,10 @@ static NSString * image9 = @"https://img05.allinmd.cn/public1/M00/43/66/ooYBAFho
         model.photoThumbnailUrlStr = urlArray[i-1];
         model.photoHightImageUrlStr = [self makeCImageLargeUrlWiththumbUpUrl:model.photoThumbnailUrlStr];
         model.photoDes= @"jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看jbjhjnikjnikjnikjnkjnkjnijk汇纳科技你看就妮可妮可妮可能看见你看你看你看你看见你看见你看见你看见你看见你看";
-        model.potoesTitle = @"治疗前";
+        if (i == 2 || i == 7) {
+            model.photoDes= @"你看见你看见你看见你看";
+        }
+        model.photoesTitle = @"治疗前";
         [browseVC.dataArray addObject:model];
     }
 //    self.transition = [[WYPhotoBrowseTransition alloc] init];
@@ -63,24 +66,34 @@ static NSString * image9 = @"https://img05.allinmd.cn/public1/M00/43/66/ooYBAFho
 //    self.transition.transitionBeforeImageFrame = self.button.frame;
 //    self.transition.transitionAfterImgFrame = [self.transition imageScreenWithImageFrame:self.button.imageView.bounds];
 //    self.transition.isFadToShow = YES;
-    browseVC.currentIndex = 1;
-    browseVC.InteractiveType = eWYPhotoBrowseInteractiveCloseByButtonType;
+    browseVC.currentIndex = 0;
+    browseVC.interactiveType = eWYPhotoBrowseInteractiveCloseByButtonType;
     browseVC.rightButtonType = eWYPhotoBrowseSave;
     browseVC.delegate = self;
-    browseVC.animatedTransition.transitionImage = self.button.imageView.image;
-    browseVC.animatedTransition.transitionBeforeImageFrame = self.button.frame;
-    browseVC.animatedTransition.transitionAfterImgFrame = [browseVC.animatedTransition imageScreenWithImageFrame:self.button.imageView.bounds];
-    browseVC.animatedTransition.isFadToShow = YES;
+//    browseVC.animatedTransition.transitionImage = self.button.imageView.image;
+//    browseVC.animatedTransition.transitionBeforeImageFrame = self.button.frame;
+//    browseVC.animatedTransition.transitionAfterImgFrame = [browseVC.animatedTransition imageScreenWithImageFrame:self.button.imageView.bounds];
+//    browseVC.animatedTransition.isFadToShow = YES;
     [self presentViewController:browseVC animated:YES completion:nil];
 }
 
+#pragma mark -WYPhotoBrowseControllerDelegate
+- (void)wyPhotoBrowseControllerViewWillAppear {
+    
+}
+
+- (void)wyPhotoBrowseControllerViewWillDissAppear {
+    
+}
 
 - (void)wyPhotoBrowseClickRightWithWYPhotoBrowseVC:(WYPhotoBrowseController *)browseVC {
     
     switch (browseVC.rightButtonType) {
         case eWYPhotoBrowseSave:
+            // 保存图片的代码
             break;
         case eWYPhotoBrowseDelete:
+            // 删除图片的代码
             break;
         default:
             break;

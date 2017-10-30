@@ -12,6 +12,9 @@
 
 @class WYPhotoBrowseController;
 typedef NS_ENUM(NSUInteger, eWYPhotoBrowseRightButtonType) {
+    
+    // 默认
+    eWYPhotoBrowseDefault = 0,
     // 删除
     eWYPhotoBrowseDelete = 1,
     // 保存
@@ -55,7 +58,7 @@ typedef NS_ENUM(NSUInteger, eWYPhotoBrowseInteractiveType) {
 /** 点击数组类型*/
 @property (nonatomic, assign) eWYPhotoBrowseRightButtonType rightButtonType;
 /** 关闭的交互类型 */
-@property (nonatomic, assign) eWYPhotoBrowseInteractiveType InteractiveType;
+@property (nonatomic, assign) eWYPhotoBrowseInteractiveType interactiveType;
 /** 代理 */
 @property (nonatomic, weak) id<WYPhotoBrowseControllerDelegate>delegate;
 /** 转场动画 */

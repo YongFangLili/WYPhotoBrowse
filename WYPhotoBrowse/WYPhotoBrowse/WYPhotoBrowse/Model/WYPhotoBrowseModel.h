@@ -17,13 +17,13 @@
 /** 图片描述 */
 @property (nonatomic, copy) NSString *photoDes;
 /** 图片标题 */
-@property (nonatomic, copy) NSString *potoesTitle;
+@property (nonatomic, copy) NSString *photoesTitle;
 
 
-/**
- *   获取图片_c地址 75%.
- *  @return 图片_c地址
- */
-- (NSString *)makeCImageLargeUrl;
+///**
+// *   获取图片_c地址 75%.
+// *  @return 图片_c地址
+// */
+//- (NSString *)makeCImageLargeUrl;
 
 @end

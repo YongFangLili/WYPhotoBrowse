@@ -10,13 +10,12 @@
 
 @implementation WYPhotoBrowseTransitionPop
 
-
 /**
  * @brief 转场动画的时间
  */
 - (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
     
-    return 0.5;
+    return 0.4;
 }
 
 
