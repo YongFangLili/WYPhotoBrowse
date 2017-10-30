@@ -12,7 +12,14 @@
 #import "WYPhotoBrowseDrivenInteractive.h"
 #import "MBProgressHUD.h"
 
-#define kDesphotoViewWidth ([UIScreen mainScreen].bounds.size.width - 15 - 15)
+#define kWYDesphotoViewWidth ([UIScreen mainScreen].bounds.size.width - kWYLeftMargin_15 - kWYLeftMargin_15)
+#define kWYiPhoneXInch ([UIScreen mainScreen].bounds.size.height == 812.0)
+#define kWYNavHeight   (kWYiPhoneXInch ? 88 : 64)
+#define kWYTopButtonHeight 46
+#define kWYLeftMargin_15 15
+#define kWYLeftMargin_10 10
+#define kWYTopButtonY (kWYNavHeight - kWYTopButtonHeight)
+
 static NSString *kPhotoCellIdentifier = @"photoCellIdentifier";
 @interface WYPhotoBrowseController ()
 <UICollectionViewDelegate,
@@ -34,8 +41,6 @@ WYPhotoViewCellDelegate
 @property (nonatomic, strong) UILabel *pageLable;
 /** title */
 @property (nonatomic, strong) UILabel *titleLable;
-/** 转场动画 */
-@property (nonatomic, strong) WYPhotoBrowseTransition *animatedTransition;
 /** 图片的中心 */
 @property (nonatomic, assign) CGPoint transitionImgViewCenter;
 /** topView的中心 */
@@ -57,21 +62,37 @@ WYPhotoViewCellDelegate
     [self addPanGesture];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    
+    [super viewWillAppear:animated];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseControllerViewWillAppear)]) {
+        [self.delegate wyPhotoBrowseControllerViewWillAppear];
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    
+    [super viewWillDisappear:animated];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseControllerViewWillDissAppear)]) {
+        [self.delegate wyPhotoBrowseControllerViewWillDissAppear];
+    }
+}
+
 - (void)setUpUI {
 
     // collectionView
     [self.view addSubview:self.collectionView];
     // topView
-    [self.view addSubview:self.topView];
-    UIButton *closeBtn = [[UIButton alloc] initWithFrame:CGRectMake(10, 18, 46, 46)];
+    [self.view addSubview:self.topView];//18
+    UIButton *closeBtn = [[UIButton alloc] initWithFrame:CGRectMake(kWYLeftMargin_10, kWYTopButtonY, kWYTopButtonHeight, kWYTopButtonHeight)];
     [closeBtn setTitle:@"关闭" forState:UIControlStateNormal];
     [closeBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [closeBtn addTarget:self action:@selector(clickCloseBtn:) forControlEvents:UIControlEventTouchUpInside];
     [self.topView addSubview:closeBtn];
     // 保存或者是删除
-    UIButton *rightBtn = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width - 10 - 46 , 18, 46, 46)];
+    UIButton *rightBtn = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width - kWYLeftMargin_10 - kWYTopButtonHeight , kWYTopButtonY, kWYTopButtonHeight, kWYTopButtonHeight)];
     [rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    switch (self.browseType) {
+    switch (self.rightButtonType) {
         case eWYPhotoBrowseSave:
             [rightBtn setTitle:@"保存" forState:UIControlStateNormal];
             break;
@@ -84,7 +105,7 @@ WYPhotoViewCellDelegate
     }
     [self.topView addSubview:rightBtn];
     [rightBtn addTarget:self action:@selector(clickRightBtn:) forControlEvents:UIControlEventTouchUpInside];
-    self.titleLable.frame = CGRectMake(CGRectGetMaxX(closeBtn.frame), 18, self.view.bounds.size.width - 2 *(CGRectGetMaxX(closeBtn.frame)) , 46);
+    self.titleLable.frame = CGRectMake(CGRectGetMaxX(closeBtn.frame), kWYTopButtonY, self.view.bounds.size.width - 2 *(CGRectGetMaxX(closeBtn.frame)) , kWYTopButtonHeight);
     [self.topView addSubview:self.titleLable];
     // bottomView
     [self.view addSubview:self.bottomView];
@@ -93,15 +114,15 @@ WYPhotoViewCellDelegate
     [self updatePageDes];
 }
 
+/**
+ * @brief 添加手势
+ */
 - (void)addPanGesture {
     
     // 创建转场手势
-//    if (self.navigationController.topViewController != self) {
-        UIPanGestureRecognizer *interactiveTransitionRecognizer;
-        interactiveTransitionRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(interactiveTransitionRecognizerAction:)];
-        [self.view addGestureRecognizer:interactiveTransitionRecognizer];
-    
-//    }
+    UIPanGestureRecognizer *interactiveTransitionRecognizer;
+    interactiveTransitionRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(interactiveTransitionRecognizerAction:)];
+    [self.view addGestureRecognizer:interactiveTransitionRecognizer];
 }
 
 #pragma mark - click Mehod
@@ -132,6 +153,7 @@ WYPhotoViewCellDelegate
     self.pageLable.attributedText = pageAttributeStr;
     [self.bottomView addSubview:self.pageLable];
     self.photoDesView.text  = model.photoDes;
+    self.titleLable.text = model.potoesTitle;
     
     // 更新frame
     // 设置富文本，设置版本更显描述textView
@@ -141,31 +163,36 @@ WYPhotoViewCellDelegate
     [paragraph setParagraphSpacing:5];//设置段落间距
     NSDictionary *attributeDic = @{NSFontAttributeName:[UIFont systemFontOfSize:13],NSParagraphStyleAttributeName:paragraph,NSForegroundColorAttributeName:[UIColor whiteColor] };
     [attributeStr setAttributes:attributeDic range:NSMakeRange(0, attributeStr.length)];
-    CGFloat desViewHeight = [model.photoDes boundingRectWithSize:CGSizeMake(kDesphotoViewWidth,MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:attributeDic context:nil].size.height;
+    CGFloat desViewHeight = [model.photoDes boundingRectWithSize:CGSizeMake(kWYDesphotoViewWidth,MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:attributeDic context:nil].size.height;
     desViewHeight = desViewHeight > (4 * 13 + 4 * 4 + 13 + 13/2) ? (4 * 13 + 4 * 4 + 13 + 13/2) : desViewHeight;
     self.photoDesView.attributedText = attributeStr;
-    CGFloat bottomViewHeight = (15 + 30) + desViewHeight;
+    CGFloat bottomViewHeight = (kWYLeftMargin_15 + kWYLeftMargin_15 * 2) + desViewHeight;
     self.bottomView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height -  bottomViewHeight, [UIScreen mainScreen].bounds.size.width, bottomViewHeight);
-    self.pageLable.frame = CGRectMake(0, bottomViewHeight - 30, [UIScreen mainScreen].bounds.size.width, 30);
-    self.photoDesView.frame = CGRectMake(15, 15, kDesphotoViewWidth, desViewHeight);
+    self.pageLable.frame = CGRectMake(kWYLeftMargin_15, bottomViewHeight - kWYLeftMargin_15 * 2, [UIScreen mainScreen].bounds.size.width - kWYLeftMargin_15 * 2, kWYLeftMargin_15 * 2);
+    self.photoDesView.frame = CGRectMake(kWYLeftMargin_15, kWYLeftMargin_15, kWYDesphotoViewWidth, desViewHeight);
     [self.collectionView setContentOffset:CGPointMake(self.currentIndex *([UIScreen mainScreen].bounds.size.width), 0)];
-    self.titleLable.text = model.potoesTitle;
 }
 
+/**
+ * @brief 点击右侧按钮回调
+ */
 - (void)didClickRightButtonSucucess {
     
-        switch (self.browseType) {
-            case eWYPhotoBrowseSave:
-                [self savePhoto];
-                break;
-            case eWYPhotoBrowseDelete:
-                [self deletePhotoSucessfull];
-                break;
-            default:
-                break;
-        }
+    switch (self.rightButtonType) {
+        case eWYPhotoBrowseSave:
+            [self savePhoto];
+            break;
+        case eWYPhotoBrowseDelete:
+            [self deletePhotoSucessfull];
+            break;
+        default:
+            break;
+    }
 }
 
+/**
+ * @brief 保存相册
+ */
 - (void)savePhoto {
 
     // 保存相册
@@ -173,7 +200,9 @@ WYPhotoViewCellDelegate
     UIImageWriteToSavedPhotosAlbum(cell.imageView.image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
 }
 
-// 保存是否成功的回调
+/**
+ * @brief 相册保存成功
+ */
 - (void)image: (UIImage *) image didFinishSavingWithError: (NSError *) error contextInfo: (void *) contextInfo {
     
     [MBProgressHUD hideHUDForView:self.view animated:YES];
@@ -218,8 +247,6 @@ WYPhotoViewCellDelegate
     
     WYPhotoBrowseModel *model = self.dataArray[self.currentIndex];
     if ([self.dataArray containsObject:model]) {
-        /// 被删除的下标.
-        NSInteger index = [self.dataArray indexOfObject:model];
         [self.dataArray removeObject:model];
     }
     if (self.dataArray.count == 0) {
@@ -243,7 +270,6 @@ WYPhotoViewCellDelegate
 - (void)hideTopAndBottomView {
     
     [UIView animateWithDuration:(0.25) animations:^{
-        
         if (self.topView.frame.origin.y < 0) {
             self.topView.frame = CGRectMake(self.topView.frame.origin.x,0 , self.topView.bounds.size.width, self.topView.bounds.size.height);
             self.bottomView.frame = CGRectMake(self.bottomView.frame.origin.x, [UIScreen mainScreen].bounds.size.height - self.bottomView.bounds.size.height, self.bottomView.bounds.size.width, self.bottomView.bounds.size.height);
@@ -330,7 +356,7 @@ WYPhotoViewCellDelegate
             // 手势点击关闭
         case eWYPhotoBrowseInteractiveCloseByGestureClickType:
         {
-            [self.navigationController popViewControllerAnimated:YES];
+            [self dismissViewControllerAnimated:YES completion:nil];
         }
             break;
         default:
@@ -350,6 +376,7 @@ WYPhotoViewCellDelegate
             break;
         case UIGestureRecognizerStateBegan:{
             //1. 设置代理
+            self.animatedTransition = nil;
             self.animatedTransition.gestureRecognizer = gestureRecognizer;
             self.transitioningDelegate = self.animatedTransition;
             self.transitionImgViewCenter = cell.imageView.center;
@@ -364,7 +391,6 @@ WYPhotoViewCellDelegate
             
             cell.imageView.center = CGPointMake(cell.imageView.center.x, self.transitionImgViewCenter.y + translation.y);
             if (cell.imageView.center.y >= self.transitionImgViewCenter.y && translation.y >= 0) {
-                
                 self.bottomView.center = CGPointMake(self.bottomView.center.x, self.transitionBottomViewCenter.y + translation.y);
                 self.topView.center = CGPointMake(self.bottomView.center.x, self.transitionTopViewCenter.y - translation.y);
             }else {
@@ -376,7 +402,6 @@ WYPhotoViewCellDelegate
         case UIGestureRecognizerStateFailed:
         case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateEnded: {
-            
             if (scale > 0.8f) {
                 [UIView animateWithDuration:0.2 animations:^{
                     // 重置位置
@@ -385,14 +410,9 @@ WYPhotoViewCellDelegate
                     cell.imageView.transform = CGAffineTransformMakeScale(1, 1);
                     self.bottomView.center = self.transitionBottomViewCenter;
                     self.topView.center = self.transitionTopViewCenter;
-                    
                 } completion:^(BOOL finished) {
                     self.animatedTransition.gestureRecognizer = nil;
                 }];
-            }else{
-                
-                // UIWindow * window=[[[UIApplication sharedApplication] delegate] window];
-                // CGRect rect=[cell.productImage convertRect: cell.productImage.bounds toView:window];
             }
             CGRect originFrame = [self backScreenImageViewRectWithImage:cell.imageView.image];
             self.animatedTransition.transitionImage = cell.imageView.image;
@@ -423,7 +443,7 @@ WYPhotoViewCellDelegate
 - (UIView *)topView {
     
     if (!_topView) {
-        _topView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 64)];
+        _topView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, kWYNavHeight)];
         _topView.backgroundColor = [UIColor blackColor];
         _topView.alpha = 0.7;
     }
@@ -471,7 +491,7 @@ WYPhotoViewCellDelegate
 - (UIView *)bottomView {
     
     if (!_bottomView) {
-        _bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 30, [UIScreen mainScreen].bounds.size.width, 30)];
+        _bottomView = [[UIView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - kWYLeftMargin_15 * 2, [UIScreen mainScreen].bounds.size.width, kWYLeftMargin_15 * 2)];
         _bottomView.backgroundColor = [UIColor blackColor];
         _bottomView.alpha = 0.7;
     }
@@ -490,6 +510,7 @@ WYPhotoViewCellDelegate
     
     if (!_animatedTransition) {
         _animatedTransition = [[WYPhotoBrowseTransition alloc] init];
+        self.transitioningDelegate = _animatedTransition;
     }
     return _animatedTransition;
 }

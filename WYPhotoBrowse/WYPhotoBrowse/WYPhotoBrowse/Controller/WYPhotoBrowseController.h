@@ -8,9 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import "WYPhotoBrowseModel.h"
+#import "WYPhotoBrowseTransition.h"
+
 @class WYPhotoBrowseController;
-typedef NS_ENUM(NSUInteger, eWYPhotoBrowseType) {
-    
+typedef NS_ENUM(NSUInteger, eWYPhotoBrowseRightButtonType) {
     // 删除
     eWYPhotoBrowseDelete = 1,
     // 保存
@@ -26,33 +27,43 @@ typedef NS_ENUM(NSUInteger, eWYPhotoBrowseInteractiveType) {
 };
 
 @protocol WYPhotoBrowseControllerDelegate <NSObject>
-
 @optional
+/**
+ * @brief loadView
+ */
 - (void)wyPhotoBrowseControllerLoadView;
+/**
+ * @brief viewWillAppear
+ */
 - (void)wyPhotoBrowseControllerViewWillAppear;
+/**
+ * @brief viewWillDisAppear
+ */
 - (void)wyPhotoBrowseControllerViewWillDissAppear;
+/**
+ * @brief 点击右侧按钮
+ */
 - (void)wyPhotoBrowseClickRightWithWYPhotoBrowseVC:(WYPhotoBrowseController *)browseVC;
 
 @end
 
 @interface WYPhotoBrowseController : UIViewController
-
+/** 照片数组 */
+@property (nonatomic, strong) NSMutableArray <WYPhotoBrowseModel *>*dataArray;
 /** 当前的currentIndex */
 @property (nonatomic, assign) NSInteger currentIndex;
-
-/** 照片数组 */
-@property (nonatomic, strong) NSMutableArray *dataArray;
-
-/** 浏览类型 */
-@property (nonatomic, assign) eWYPhotoBrowseType browseType;
-
+/** 点击数组类型*/
+@property (nonatomic, assign) eWYPhotoBrowseRightButtonType rightButtonType;
 /** 关闭的交互类型 */
 @property (nonatomic, assign) eWYPhotoBrowseInteractiveType InteractiveType;
-
 /** 代理 */
 @property (nonatomic, weak) id<WYPhotoBrowseControllerDelegate>delegate;
+/** 转场动画 */
+@property (nonatomic, strong) WYPhotoBrowseTransition *animatedTransition;
 
-
+/**
+ * @brief 点击右边时间button成功
+ */
 - (void)didClickRightButtonSucucess;
 
 @end

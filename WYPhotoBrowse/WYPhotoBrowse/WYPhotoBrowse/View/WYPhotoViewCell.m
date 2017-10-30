@@ -46,9 +46,10 @@
     
     // 添加手势 单个手指双击
     UITapGestureRecognizer *doubleTapOne = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
-    doubleTapOne.numberOfTouchesRequired = 1; doubleTapOne.numberOfTapsRequired = 2; doubleTapOne.delegate = self;
+    doubleTapOne.numberOfTouchesRequired = 1;
+    doubleTapOne.numberOfTapsRequired = 2;
+    doubleTapOne.delegate = self;
     [self.scrollView addGestureRecognizer:doubleTapOne];
-//    self.currentZoomScale = self.scrollView.zoomScale;
     // 点击手势  单击
     UITapGestureRecognizer *singleTapOne = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
     singleTapOne.numberOfTouchesRequired = 1;
@@ -72,6 +73,9 @@
     
 }
 
+/**
+ * @brief 单击手势
+ */
 - (void)handleSingleTap:(UITapGestureRecognizer *)recognizer {
     
     // 单个手指单击，设置隐藏与显示
@@ -79,7 +83,6 @@
         [self.delegate clickSingleGesture];
     }
 }
-
 
 /**
  *  设置minimumZoomScale 和 maximumZoomScale.
@@ -99,8 +102,6 @@
     self.maxScale = _scrollView.maximumZoomScale;
 }
 
-
-
 #pragma mark - scrollViewDelegate
 -(UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
     
@@ -113,13 +114,11 @@
     CGFloat Hs = _scrollView.frame.size.height - _scrollView.contentInset.top - _scrollView.contentInset.bottom;
     CGFloat W = self.imageView.frame.size.width;
     CGFloat H = self.imageView.frame.size.height;
-    
     CGRect rct = self.imageView.frame;
     rct.origin.x = MAX((NSInteger)(Ws-W)/2, 0);
     rct.origin.y = MAX((NSInteger)(Hs-H)/2, 0);
     self.imageView.frame = rct;
 }
-
 
 #pragma mark- setters and getters
 - (void)setModel:(WYPhotoBrowseModel *)model {
@@ -127,39 +126,22 @@
     _model = model;
     // 设置图片
     [self.imageView sd_setShowActivityIndicatorView:YES];
-    [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.photoImage] placeholderImage:nil];
-    [self.imageView sd_setImageWithURL:[NSURL URLWithString:[model makeCImageLargeUrl]] placeholderImage:nil completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+    [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.photoThumbnailUrlStr] placeholderImage:nil];
+    [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.photoHightImageUrlStr] placeholderImage:nil completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
         [self.imageView sd_setShowActivityIndicatorView:NO];
         
         if(!image) return ;
-        _scrollView.zoomScale = 1;
+        self.scrollView.zoomScale = 1;
         CGSize size = image.size;
-        CGFloat ratio = MAX(size.width / _scrollView.frame.size.width,
-                            size.height / _scrollView.frame.size.height);
-        if(ratio < 1)
-        {
-//            self.imageView.contentMode = UIViewContentModeCenter;
+        CGFloat ratio = MAX(size.width / _scrollView.frame.size.width,size.height / _scrollView.frame.size.height);
+        if(ratio < 1) {
             self.imageView.frame = CGRectMake(0, 0, size.width, size.height);
-            self.imageView.center = CGPointMake(CGRectGetWidth(_scrollView.frame)/2.0,
-                                                    CGRectGetHeight(_scrollView.frame)/2.0);
-//            self.imageView.contentMode = UIViewContentModeCenter;
+            self.imageView.center = CGPointMake(CGRectGetWidth(self.scrollView.frame)/2.0,CGRectGetHeight(self.scrollView.frame)/2.0);
+        }else {
+            self.imageView.frame = CGRectMake(0, 0,CGRectGetWidth(self.scrollView.frame),CGRectGetHeight(self.scrollView.frame));
         }
-        else
-        {
-            self.imageView.frame = CGRectMake(0, 0,
-                                                  CGRectGetWidth(_scrollView.frame),
-                                                  CGRectGetHeight(_scrollView.frame));
-//            self.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        }
-        
-//        self.imageView.frame = CGRectMake(0, 0,
-//                                          CGRectGetWidth(self.containerView.frame),
-//                                          CGRectGetHeight(self.containerView.frame));
-        
         [self resetMMZoomScale];
-        _scrollView.zoomScale = _scrollView.minimumZoomScale;
-        
-//        [self scrollViewDidZoom:_scrollView];
+        self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
     }];
 }
 

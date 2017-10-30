@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+
 @interface WYPhotoBrowseTransition : NSObject<UIViewControllerTransitioningDelegate>
 
 /** 交互式转场frame */
@@ -21,6 +22,8 @@
 @property (nonatomic, strong) UIPanGestureRecognizer *gestureRecognizer;
 /** 渐进效果 */
 @property (nonatomic, assign) BOOL isFadToShow;
-
+/**
+ * @brief image在屏幕中心的位置
+ */
 - (CGRect)imageScreenWithImageFrame:(CGRect)imageFrame;
 @end

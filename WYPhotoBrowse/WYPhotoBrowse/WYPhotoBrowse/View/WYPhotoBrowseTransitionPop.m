@@ -40,7 +40,6 @@
     UIView *fromView = fromViewController.view;
     [containerView addSubview:fromView];
     
-    
     [UIView animateWithDuration:[self transitionDuration:transitionContext] delay:0.0 usingSpringWithDamping:1 initialSpringVelocity:0.3 options:UIViewAnimationOptionCurveLinear animations:^{
         
         bgView.alpha = 0;
@@ -56,6 +55,4 @@
         [transitionContext completeTransition:!wasCancelled];
     }];
 }
-
-
 @end

@@ -22,13 +22,9 @@
 @end
 @implementation WYPhotoBrowseDrivenInteractive
 
-{
-    BOOL _isFirst;
-}
 - (instancetype)initWithGestureRecognizer:(UIPanGestureRecognizer *)gestureRecognizer {
     self = [super init];
     if (self) {
-        _isFirst = YES;
         _gestureRecognizer = gestureRecognizer;
         [_gestureRecognizer addTarget:self action:@selector(gestureRecognizeDidUpdate:)];
     }
@@ -50,15 +46,9 @@
     
     CGFloat scrale = [self percentForGesture:gestureRecognizer];
     NSLog(@"interactive %f",scrale);
-    
-    //    if (_isFirst) {
     [self beginInterPercent];
-    //        _isFirst = NO;
-    //    }
     switch (gestureRecognizer.state) {
-            
         case UIGestureRecognizerStateBegan:
-
             break;
         case UIGestureRecognizerStateChanged:
             [self updateInteractiveTransition:[self percentForGesture:gestureRecognizer]];
@@ -99,7 +89,6 @@
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     UIView *toView = toViewController.view;
     [containerView addSubview:toView];
-    
     //有渐变的黑色背景
     _blackBgView = [[UIView alloc] initWithFrame:containerView.bounds];
     _blackBgView.backgroundColor = [UIColor blackColor];
@@ -150,7 +139,6 @@
     UIViewController *toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     UIView *toView = toViewController.view;
     [containerView addSubview:toView];
-    
     //有渐变的黑色背景
     UIView *bgView = [[UIView alloc] initWithFrame:containerView.bounds];
     bgView.backgroundColor = [UIColor blackColor];
@@ -176,14 +164,12 @@
     }
     
     [UIView animateWithDuration:0.5 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:0.1 options:UIViewAnimationOptionCurveLinear animations:^{
-        
         transitionImgView.frame = offsetFrame;
         bgView.alpha = 0;
         
     }completion:^(BOOL finished) {
         
         NSLog(@"panGesture animation finished");
-        
         [_blackBgView removeFromSuperview];
         _blackBgView = nil;
         [bgView removeFromSuperview];
@@ -192,17 +178,15 @@
     }];
 }
 
+#pragma mark- setters and getters
 - (void)setGestureRecognizer:(UIPanGestureRecognizer *)gestureRecognizer {
     
     _gestureRecognizer = gestureRecognizer;
      [_gestureRecognizer addTarget:self action:@selector(gestureRecognizeDidUpdate:)];
-
 }
 
 - (void)dealloc {
-    
     [self.gestureRecognizer removeTarget:self action:@selector(gestureRecognizeDidUpdate:)];
 }
-
 
 @end

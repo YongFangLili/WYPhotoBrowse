@@ -22,6 +22,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>是否允许唯医使用你的相机？</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>是否允许添加到相册？</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>是否允许唯医访问你的媒体资料库？</string>
 	<key>UILaunchStoryboardName</key>
