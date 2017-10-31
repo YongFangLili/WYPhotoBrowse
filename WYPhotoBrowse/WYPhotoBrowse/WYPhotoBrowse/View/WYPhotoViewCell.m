@@ -14,9 +14,8 @@
 
 /** UIScrollView */
 @property (nonatomic, strong) UIScrollView *scrollView;
-
 /** 小菊花 */
-@property (nonatomic, copy) UIActivityIndicatorView *activityView;
+@property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
 /** 最小缩放 */
 @property (nonatomic, assign) CGFloat miniScale;
 /** 最大缩放 */
@@ -36,6 +35,17 @@
         self.miniScale = 1.0;
         self.maxScale = 3.0;
         [self addGesHandles];
+        self.activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:(UIActivityIndicatorViewStyleGray)];
+        [self.contentView addSubview:self.activityIndicator];
+        self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+        //设置小菊花的frame
+        self.activityIndicator.frame= CGRectMake(100, 100, 50, 50);
+        //设置小菊花颜色
+        self.activityIndicator.color = [UIColor whiteColor];
+        //设置背景颜色
+        self.activityIndicator.backgroundColor = [UIColor clearColor];
+        self.activityIndicator.center = self.contentView.center;
+        self.activityIndicator.hidesWhenStopped = NO;
     }
     return self;
 }
@@ -69,7 +79,7 @@
         
         [self.scrollView setZoomScale:self.miniScale animated:YES];
     }else {
-        [self.scrollView setZoomScale:2 animated:YES];
+        [self.scrollView setZoomScale:self.maxScale animated:YES];
     }
     
 }
@@ -96,8 +106,8 @@
     _scrollView.contentSize = self.bounds.size;
     _scrollView.minimumZoomScale = 1;
     _scrollView.maximumZoomScale = MAX(MAX(Rw, Rh), 1);
-    if (_scrollView.maximumZoomScale == 1) {
-        _scrollView.maximumZoomScale = 2;
+    if (_scrollView.maximumZoomScale == self.miniScale) {
+        _scrollView.maximumZoomScale = self.maxScale;
     }
     self.miniScale = _scrollView.minimumZoomScale;
     self.maxScale = _scrollView.maximumZoomScale;
@@ -121,22 +131,42 @@
     self.imageView.frame = rct;
 }
 
+/**
+ * @brief 显示菊花
+ */
+- (void)showActivityAdicator {
+    
+    self.activityIndicator.hidesWhenStopped = NO;
+    [self.activityIndicator startAnimating];
+}
+/**
+ * @brief 隐藏菊花
+ */
+- (void)hideActivityAdicator {
+    
+    [self.activityIndicator stopAnimating];
+    self.activityIndicator.hidesWhenStopped = YES;
+}
+
 #pragma mark- setters and getters
 - (void)setModel:(WYPhotoBrowseModel *)model {
     
     _model = model;
     [self resetMMZoomScale];
-    // 设置图片
-    [self.imageView sd_setShowActivityIndicatorView:YES];
-    
+    [self showActivityAdicator];
     // 以缩略图作为默认进来的图片
     [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.photoThumbnailUrlStr] completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
         
         [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.photoHightImageUrlStr] placeholderImage:self.imageView.image completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-            [self.imageView sd_setShowActivityIndicatorView:NO];
-            // 传一个默认图片
-            if(!image) return ;
-            self.scrollView.zoomScale = 1;
+            // 隐藏菊花
+            [self hideActivityAdicator];
+            if (!image && error) {
+                if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseCellLoadImageFaliured)]) {
+                    [self.delegate wyPhotoBrowseCellLoadImageFaliured];
+                }
+                return;
+            }
+            self.scrollView.zoomScale = self.miniScale;
             CGSize size = image.size;
             CGFloat ratio = MAX(size.width / _scrollView.frame.size.width,size.height / _scrollView.frame.size.height);
             if(ratio < 1) {
@@ -149,7 +179,6 @@
             self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
         }];
     }];
-    
 }
 
 - (UIImageView *)imageView {
@@ -167,8 +196,8 @@
     if (!_scrollView) {
         _scrollView = [[UIScrollView alloc] init];
         _scrollView.delegate = self;
-        _scrollView.minimumZoomScale = 1.0;
-        _scrollView.maximumZoomScale = 2.0;
+        _scrollView.minimumZoomScale = self.miniScale;
+        _scrollView.maximumZoomScale = self.maxScale;
         _scrollView.showsVerticalScrollIndicator = NO;
         _scrollView.showsHorizontalScrollIndicator = NO;
         _scrollView.bounces = YES;

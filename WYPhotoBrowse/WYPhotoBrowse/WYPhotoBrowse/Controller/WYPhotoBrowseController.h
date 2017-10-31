@@ -48,6 +48,15 @@ typedef NS_ENUM(NSUInteger, eWYPhotoBrowseInteractiveType) {
  */
 - (void)wyPhotoBrowseClickRightWithWYPhotoBrowseVC:(WYPhotoBrowseController *)browseVC;
 
+/**
+ * @brief 保存图片成功
+ */
+- (void)wyphotoBrowseDidSavePhotoWithIsSucecess:(BOOL)sucecess;
+
+/**
+ * @brief 网络图片加载失败
+ */
+- (void)wyPhotoBrowseLoadImageFaliured;
 @end
 
 @interface WYPhotoBrowseController : UIViewController

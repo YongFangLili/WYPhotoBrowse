@@ -66,6 +66,7 @@ WYPhotoViewCellDelegate
 - (void)viewWillAppear:(BOOL)animated {
     
     [super viewWillAppear:animated];
+     [[UIApplication sharedApplication] setStatusBarHidden:YES];
     if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseControllerViewWillAppear)]) {
         [self.delegate wyPhotoBrowseControllerViewWillAppear];
     }
@@ -74,9 +75,16 @@ WYPhotoViewCellDelegate
 - (void)viewWillDisappear:(BOOL)animated {
     
     [super viewWillDisappear:animated];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO];
     if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseControllerViewWillDissAppear)]) {
         [self.delegate wyPhotoBrowseControllerViewWillDissAppear];
     }
+}
+
+// 隐藏状态栏
+- (BOOL)prefersStatusBarHidden {
+    
+    return YES;
 }
 
 - (void)setUpUI {
@@ -212,23 +220,13 @@ WYPhotoViewCellDelegate
  */
 - (void)image: (UIImage *) image didFinishSavingWithError: (NSError *) error contextInfo: (void *) contextInfo {
     
-    [MBProgressHUD hideHUDForView:self.view animated:YES];
-    MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:self.view];
-    hud.mode = MBProgressHUDModeText;
-    hud.bezelView.backgroundColor = [UIColor blackColor];
-    hud.bezelView.alpha = 0.5;
-    hud.detailsLabel.textColor  = [UIColor whiteColor];
-    hud.detailsLabel.font = [UIFont systemFontOfSize:16.0];
-
-    if(error != NULL){
-        NSLog(@"保存失败");
-        hud.detailsLabel.text = @"保存失败";
-    }else{
-        hud.detailsLabel.text  = @"保存成功";
+    if (image == nil || error != nil) {
+        if (self.delegate && [self.delegate respondsToSelector:@selector(wyphotoBrowseDidSavePhotoWithIsSucecess:)]) {
+            [self.delegate wyphotoBrowseDidSavePhotoWithIsSucecess:NO];
+        }
+    }else {
+         [self.delegate wyphotoBrowseDidSavePhotoWithIsSucecess:YES];
     }
-    [self.view addSubview:hud];
-    [hud showAnimated:YES];
-    [hud hideAnimated:YES afterDelay:1.5];
 }
                    
 #pragma mark 隐藏弹框
@@ -369,6 +367,16 @@ WYPhotoViewCellDelegate
         default:
             [self dismissViewControllerAnimated:YES completion:nil];
             break;
+    }
+}
+
+/**
+ * @brief 图片下载失败提示
+ */
+- (void)wyPhotoBrowseCellLoadImageFaliured {
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseLoadImageFaliured)]) {
+        [self.delegate wyPhotoBrowseLoadImageFaliured];
     }
 }
 

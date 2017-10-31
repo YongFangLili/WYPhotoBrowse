@@ -14,6 +14,10 @@
  * @brief 单击手势点击
  */
 - (void)clickSingleGesture;
+/**
+ * @brief 图片加载失败
+ */
+- (void)wyPhotoBrowseCellLoadImageFaliured;
 
 @end
 

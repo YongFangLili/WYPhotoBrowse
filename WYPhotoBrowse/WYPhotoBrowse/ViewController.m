@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "WYPhotoBrowseController.h"
 #import "WYPhotoBrowseTransition.h"
+#import <MBProgressHUD.h>
 
 static NSString * image1 = @"https://img05.allinmd.cn/public1/M00/4F/75/oYYBAFl92xCABwXJACznWq4DFrY755_c_t_340_340.jpg";
 static NSString * image2 = @"https://img05.allinmd.cn/public1/M00/4F/76/oYYBAFl93J-AT4-NAA4--0rxvV0980_c_t_340_340.jpg";
@@ -99,6 +100,38 @@ static NSString * image9 = @"https://img05.allinmd.cn/public1/M00/14/85/ooYBAFay
             break;
     }
     [browseVC didClickRightButtonSucucess];
+}
+
+- (void)wyphotoBrowseDidSavePhotoWithIsSucecess:(BOOL)sucecess {
+    
+    //
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:self.view];
+    hud.mode = MBProgressHUDModeText;
+    hud.bezelView.backgroundColor = [UIColor blackColor];
+    hud.bezelView.alpha = 0.5;
+    hud.detailsLabel.textColor  = [UIColor whiteColor];
+    hud.detailsLabel.font = [UIFont systemFontOfSize:16.0];
+    hud.detailsLabel.text = sucecess ? @"保存成功" : @"保存失败";
+    [[UIApplication sharedApplication].keyWindow addSubview:hud];
+    [hud showAnimated:YES];
+    [hud hideAnimated:YES afterDelay:1.0];
+}
+
+- (void)wyPhotoBrowseLoadImageFaliured {
+    
+    // 图片下载失败
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    MBProgressHUD *hud = [[MBProgressHUD alloc] initWithView:self.view];
+    hud.mode = MBProgressHUDModeText;
+    hud.bezelView.backgroundColor = [UIColor blackColor];
+    hud.bezelView.alpha = 0.5;
+    hud.detailsLabel.textColor  = [UIColor whiteColor];
+    hud.detailsLabel.font = [UIFont systemFontOfSize:16.0];
+    hud.detailsLabel.text = @"下载失败";
+    [[UIApplication sharedApplication].keyWindow addSubview:hud];
+    [hud showAnimated:YES];
+    [hud hideAnimated:YES afterDelay:1.0];
 }
 
 
