@@ -155,11 +155,13 @@
     [self resetMMZoomScale];
     [self showActivityAdicator];
     // 以缩略图作为默认进来的图片
-    [self setHightImageWithURL:model.photoHightImageUrlStr thumbImage:nil];
-//    __weak typeof(self) weakSelf = self;
-//    [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.photoThumbnailUrlStr] placeholderImage:nil completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-//        [weakSelf setHightImageWithURL:model.photoHightImageUrlStr thumbImage:image];
-//    }];
+    __weak typeof(self) weakSelf = self;
+    UIImageView * imageview = [[UIImageView alloc] init];
+    [imageview sd_setImageWithURL:[NSURL URLWithString:model.photoThumbnailUrlStr] placeholderImage:nil completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+//        defaultImage = image;
+//        weakSelf.imageView.image = nil;
+        [weakSelf setHightImageWithURL:model.photoHightImageUrlStr thumbImage:image];
+    }];
 }
 
 - (void)setHightImageWithURL:(NSString *)url thumbImage:(UIImage *)thumbImage {

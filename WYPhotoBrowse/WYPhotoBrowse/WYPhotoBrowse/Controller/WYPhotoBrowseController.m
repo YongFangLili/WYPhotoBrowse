@@ -83,7 +83,6 @@ WYPhotoViewCellDelegate
 
 // 隐藏状态栏
 - (BOOL)prefersStatusBarHidden {
-    
     return YES;
 }
 
@@ -94,14 +93,13 @@ WYPhotoViewCellDelegate
     // topView
     [self.view addSubview:self.topView];//18
     UIButton *closeBtn = [[UIButton alloc] initWithFrame:CGRectMake(kWYLeftMargin_10, kWYTopButtonY, kWYTopButtonHeight, kWYTopButtonHeight)];
-    [closeBtn setTitle:@"关闭" forState:UIControlStateNormal];
-    [closeBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [closeBtn setImage:[UIImage imageNamed:@"WYPhotoBrowse_close"] forState:UIControlStateNormal];
     [closeBtn addTarget:self action:@selector(clickCloseBtn:) forControlEvents:UIControlEventTouchUpInside];
     [self.topView addSubview:closeBtn];
     // 保存或者是删除
     UIButton *rightBtn = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width - kWYLeftMargin_10 - kWYTopButtonHeight , kWYTopButtonY, kWYTopButtonHeight, kWYTopButtonHeight)];
     [rightBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
- [rightBtn addTarget:self action:@selector(clickRightBtn:) forControlEvents:UIControlEventTouchUpInside];
+    [rightBtn addTarget:self action:@selector(clickRightBtn:) forControlEvents:UIControlEventTouchUpInside];
     switch (self.rightButtonType) {
         case eWYPhotoBrowseSave:
             [rightBtn setTitle:@"保存" forState:UIControlStateNormal];
