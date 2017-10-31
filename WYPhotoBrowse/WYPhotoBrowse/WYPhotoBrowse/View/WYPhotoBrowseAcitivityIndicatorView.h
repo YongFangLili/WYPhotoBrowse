@@ -18,6 +18,6 @@
 /**
  * @brief 影藏View
  */
-- (void)hideIndicatorView;
+- (void)stopIndicatorWithSucess:(BOOL)isSucecess;
 
 @end

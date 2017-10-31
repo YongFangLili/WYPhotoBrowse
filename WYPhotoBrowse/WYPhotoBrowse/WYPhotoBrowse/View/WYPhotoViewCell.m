@@ -9,6 +9,7 @@
 #import "WYPhotoViewCell.h"
 #import <UIImageView+WebCache.h>
 #import <SDWebImage/UIView+WebCache.h>
+#import "WYPhotoBrowseAcitivityIndicatorView.h"
 
 @interface WYPhotoViewCell ()<UIScrollViewDelegate,UIGestureRecognizerDelegate>
 
@@ -16,6 +17,8 @@
 @property (nonatomic, strong) UIScrollView *scrollView;
 /** 小菊花 */
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
+
+@property (nonatomic, strong) WYPhotoBrowseAcitivityIndicatorView *indicatorView;
 /** 最小缩放 */
 @property (nonatomic, assign) CGFloat miniScale;
 /** 最大缩放 */
@@ -36,16 +39,15 @@
         self.maxScale = 3.0;
         [self addGesHandles];
         self.activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:(UIActivityIndicatorViewStyleGray)];
-        [self.contentView addSubview:self.activityIndicator];
-        self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
-        //设置小菊花的frame
-        self.activityIndicator.frame= CGRectMake(100, 100, 50, 50);
-        //设置小菊花颜色
-        self.activityIndicator.color = [UIColor whiteColor];
-        //设置背景颜色
-        self.activityIndicator.backgroundColor = [UIColor clearColor];
-        self.activityIndicator.center = self.contentView.center;
-        self.activityIndicator.hidesWhenStopped = NO;
+//        self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+//        //设置小菊花的frame
+//        self.activityIndicator.frame= CGRectMake(100, 100, 50, 50);
+//        //设置小菊花颜色
+//        self.activityIndicator.color = [UIColor whiteColor];
+//        //设置背景颜色
+//        self.activityIndicator.backgroundColor = [UIColor clearColor];
+//        self.activityIndicator.center = self.contentView.center;
+//        self.activityIndicator.hidesWhenStopped = NO;
     }
     return self;
 }
@@ -153,7 +155,10 @@
     
     _model = model;
     [self resetMMZoomScale];
-    [self showActivityAdicator];
+//    [self showActivityAdicator];
+    [self.indicatorView removeFromSuperview];
+    self.indicatorView = nil;
+    [self.indicatorView showIndicatorView];
     // 以缩略图作为默认进来的图片
     [self setHightImageWithURL:model.photoHightImageUrlStr thumbImage:nil];
 //    __weak typeof(self) weakSelf = self;
@@ -166,11 +171,12 @@
     
     [self.imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:thumbImage completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
         // 隐藏菊花
-        [self hideActivityAdicator];
+//        [self hideActivityAdicator];
+        [self.indicatorView stopIndicatorWithSucess: !(!image && error)];
         if (!image && error) {
-            if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseCellLoadImageFaliured)]) {
-                [self.delegate wyPhotoBrowseCellLoadImageFaliured];
-            }
+//            if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseCellLoadImageFaliured)]) {
+//                [self.delegate wyPhotoBrowseCellLoadImageFaliured];
+//            }
             return;
         }
         self.scrollView.zoomScale = self.miniScale;
@@ -209,5 +215,14 @@
         _scrollView.bounces = YES;
     }
     return _scrollView;
+}
+
+- (WYPhotoBrowseAcitivityIndicatorView *)indicatorView {
+
+    if (!_indicatorView) {
+        _indicatorView = [[WYPhotoBrowseAcitivityIndicatorView alloc] initWithFrame:self.contentView.bounds];
+        [self.contentView addSubview:_indicatorView];
+    }
+    return _indicatorView;
 }
 @end
