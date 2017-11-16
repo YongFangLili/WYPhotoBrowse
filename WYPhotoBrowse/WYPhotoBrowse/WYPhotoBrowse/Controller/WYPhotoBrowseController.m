@@ -12,7 +12,7 @@
 #import "WYPhotoBrowseDrivenInteractive.h"
 #import "MBProgressHUD.h"
 
-#define kWYDesphotoViewWidth ([UIScreen mainScreen].bounds.size.width - kWYLeftMargin_15 - kWYLeftMargin_15)
+#define kWYDesphotoViewWidth ([UIScreen mainScreen].bounds.size.width - kWYLeftMargin_10 - kWYLeftMargin_10)
 #define kWYiPhoneXInch ([UIScreen mainScreen].bounds.size.height == 812.0)
 #define kWYNavHeight   (kWYiPhoneXInch ? 88 : 64)
 #define kWYTopButtonHeight 46
@@ -51,6 +51,13 @@ WYPhotoViewCellDelegate
 
 @implementation WYPhotoBrowseController
 
+- (void)loadView {
+    
+    [super loadView];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseControllerLoadView:)]) {
+        [self.delegate wyPhotoBrowseControllerLoadView:self];
+    }
+}
 - (void)viewDidLoad {
     
     [super viewDidLoad];
@@ -58,9 +65,9 @@ WYPhotoViewCellDelegate
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     self.view.backgroundColor = [UIColor blackColor];
     self.automaticallyAdjustsScrollViewInsets = NO;
-    [self setUpUI];
     [self addPanGesture];
-      self.animatedTransition.isFadToShow = YES;
+    [self setUpUI];
+    self.animatedTransition.isFadToShow = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -75,7 +82,7 @@ WYPhotoViewCellDelegate
 - (void)viewWillDisappear:(BOOL)animated {
     
     [super viewWillDisappear:animated];
-    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+     [[UIApplication sharedApplication] setStatusBarHidden:NO];
     if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseControllerViewWillDissAppear)]) {
         [self.delegate wyPhotoBrowseControllerViewWillDissAppear];
     }
@@ -83,6 +90,7 @@ WYPhotoViewCellDelegate
 
 // 隐藏状态栏
 - (BOOL)prefersStatusBarHidden {
+    
     return YES;
 }
 
@@ -141,8 +149,17 @@ WYPhotoViewCellDelegate
 
 - (void)clickRightBtn:(UIButton *)btn {
     
-    if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseClickRightWithWYPhotoBrowseVC:)]) {
-        [self.delegate wyPhotoBrowseClickRightWithWYPhotoBrowseVC:self];
+    switch (self.rightButtonType) {
+        case eWYPhotoBrowseDelete:
+            if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseClickRightWithWYPhotoBrowseVC:)]) {
+                [self.delegate wyPhotoBrowseClickRightWithWYPhotoBrowseVC:self];
+            }
+            break;
+        case eWYPhotoBrowseSave:
+            [self savePhoto];
+            break;
+        default:
+            break;
     }
 }
 
@@ -166,24 +183,26 @@ WYPhotoViewCellDelegate
     // 更新frame
     // 设置富文本，设置版本更显描述textView
     CGFloat desViewHeight = 0.0;
+    CGFloat bottomViewHeight = 0.0;
     // 处理为nil的情况
-    if (!model.photoDes && model.photoDes.length == 0) {
+    if (!model.photoDes || model.photoDes.length == 0) {
+         bottomViewHeight = (kWYLeftMargin_10 * 2 + kWYLeftMargin_15) + desViewHeight;
     }else {
         
         NSMutableAttributedString * attributeStr = [[NSMutableAttributedString alloc]initWithString:model.photoDes];
         NSMutableParagraphStyle * paragraph = [[NSMutableParagraphStyle alloc]init];
         [paragraph setLineSpacing:4];//设置行间距
         [paragraph setParagraphSpacing:5];//设置段落间距
-        NSDictionary *attributeDic = @{NSFontAttributeName:[UIFont systemFontOfSize:13],NSParagraphStyleAttributeName:paragraph,NSForegroundColorAttributeName:[UIColor whiteColor] };
+        NSDictionary *attributeDic = @{NSFontAttributeName:[UIFont systemFontOfSize:15],NSParagraphStyleAttributeName:paragraph,NSForegroundColorAttributeName:[UIColor whiteColor] };
         [attributeStr setAttributes:attributeDic range:NSMakeRange(0, attributeStr.length)];
         desViewHeight = [model.photoDes boundingRectWithSize:CGSizeMake(kWYDesphotoViewWidth,MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:attributeDic context:nil].size.height;
-        desViewHeight = desViewHeight > (4 * 13 + 4 * 4 + 13 + 13/2) ? (4 * 13 + 4 * 4 + 13 + 13/2) : desViewHeight;
+        desViewHeight = desViewHeight > (4 * 15+ 4 * 4 + 15 + 15/2) ? (4 * 15 + 4 * 4 + 15 + 15/2) : desViewHeight;
         self.photoDesView.attributedText = attributeStr;
+        bottomViewHeight = (kWYLeftMargin_10 + kWYLeftMargin_10 * 2 + kWYLeftMargin_15) + desViewHeight;
     }
-    CGFloat bottomViewHeight = (kWYLeftMargin_15 + kWYLeftMargin_15 * 2) + desViewHeight;
     self.bottomView.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height -  bottomViewHeight, [UIScreen mainScreen].bounds.size.width, bottomViewHeight);
-    self.pageLable.frame = CGRectMake(kWYLeftMargin_15, bottomViewHeight - kWYLeftMargin_15 * 2, [UIScreen mainScreen].bounds.size.width - kWYLeftMargin_15 * 2, kWYLeftMargin_15 * 2);
-    self.photoDesView.frame = CGRectMake(kWYLeftMargin_15, kWYLeftMargin_15, kWYDesphotoViewWidth, desViewHeight);
+    self.pageLable.frame = CGRectMake(kWYLeftMargin_15, bottomViewHeight - kWYLeftMargin_10 - kWYLeftMargin_15, [UIScreen mainScreen].bounds.size.width - kWYLeftMargin_15 * 2, kWYLeftMargin_15);
+    self.photoDesView.frame = CGRectMake(kWYLeftMargin_10 , kWYLeftMargin_10, kWYDesphotoViewWidth, desViewHeight);
     [self.collectionView setContentOffset:CGPointMake(self.currentIndex *([UIScreen mainScreen].bounds.size.width), 0)];
 }
 
@@ -210,7 +229,7 @@ WYPhotoViewCellDelegate
 - (void)savePhoto {
     // 保存相册
     WYPhotoViewCell*cell =(WYPhotoViewCell *) [self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForRow:self.currentIndex inSection:0]];
-    UIImageWriteToSavedPhotosAlbum(cell.imageView.image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
+    UIImageWriteToSavedPhotosAlbum(cell.photoImageView.image, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
 }
 
 /**
@@ -377,7 +396,6 @@ WYPhotoViewCellDelegate
         [self.delegate wyPhotoBrowseLoadImageFaliured];
     }
 }
-
 /**
  * @brief pan手势滑动（上下滑动image）
  */
@@ -393,21 +411,21 @@ WYPhotoViewCellDelegate
             break;
         case UIGestureRecognizerStateBegan:{
             //1. 设置代理
-            self.animatedTransition = nil;
+//            self.animatedTransition = nil;
             self.animatedTransition.gestureRecognizer = gestureRecognizer;
             self.transitioningDelegate = self.animatedTransition;
-            self.transitionImgViewCenter = cell.imageView.center;
+            self.transitionImgViewCenter = cell.photoImageView.center;
             self.transitionBottomViewCenter = self.bottomView.center;
             self.transitionTopViewCenter = self.topView.center;
+            self.animatedTransition.transitionBeforeImageFrame = [self backScreenImageViewRectWithImage:cell.photoImageView.image];
             //3.dismiss
             [self dismissViewControllerAnimated:YES completion:nil];
-            self.animatedTransition.transitionBeforeImageFrame = [self backScreenImageViewRectWithImage:cell.imageView.image];
         }
             break;
         case UIGestureRecognizerStateChanged: {
             
-            cell.imageView.center = CGPointMake(cell.imageView.center.x, self.transitionImgViewCenter.y + translation.y);
-            if (cell.imageView.center.y >= self.transitionImgViewCenter.y && translation.y >= 0) {
+            cell.photoImageView.center = CGPointMake(cell.photoImageView.center.x, self.transitionImgViewCenter.y + translation.y);
+            if (cell.photoImageView.center.y >= self.transitionImgViewCenter.y && translation.y >= 0) {
                 self.bottomView.center = CGPointMake(self.bottomView.center.x, self.transitionBottomViewCenter.y + translation.y);
                 self.topView.center = CGPointMake(self.bottomView.center.x, self.transitionTopViewCenter.y - translation.y);
             }else {
@@ -422,21 +440,33 @@ WYPhotoViewCellDelegate
             if (scale > 0.8f) {
                 [UIView animateWithDuration:0.2 animations:^{
                     // 重置位置
-                    cell.imageView.center = self.transitionImgViewCenter;
-                    cell.imageView.alpha = 1.0;
-                    cell.imageView.transform = CGAffineTransformMakeScale(1, 1);
+                    cell.photoImageView.center = self.transitionImgViewCenter;
+                    cell.photoImageView.alpha = 1.0;
+                    cell.photoImageView.transform = CGAffineTransformMakeScale(1, 1);
                     self.bottomView.center = self.transitionBottomViewCenter;
                     self.topView.center = self.transitionTopViewCenter;
                 } completion:^(BOOL finished) {
                     self.animatedTransition.gestureRecognizer = nil;
                 }];
             }
-            CGRect originFrame = [self backScreenImageViewRectWithImage:cell.imageView.image];
-            self.animatedTransition.transitionImage = cell.imageView.image;
-            self.animatedTransition.transitionAfterImgFrame = CGRectMake(originFrame.origin.x ,cell.imageView.center.y - originFrame.size.height / 2,originFrame.size.width, originFrame.size.height);
+            CGRect originFrame = [self backScreenImageViewRectWithImage:cell.photoImageView.image];
+            self.animatedTransition.transitionImage = cell.photoImageView.image;
+            self.animatedTransition.transitionAfterImgFrame = CGRectMake(originFrame.origin.x ,cell.photoImageView.center.y - originFrame.size.height / 2,originFrame.size.width, originFrame.size.height);
         }
     }
 }
+
+// 不让旋转
+- (BOOL)shouldAutorotate {
+    
+    return NO;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations{
+    
+    return UIInterfaceOrientationMaskPortrait;
+}
+
 
 #pragma mark - lazy
 - (UICollectionView *)collectionView {
@@ -471,7 +501,7 @@ WYPhotoViewCellDelegate
     
     if (!_photoDesView) {
         _photoDesView = [[UITextView alloc] init];
-        _photoDesView.font = [UIFont systemFontOfSize:13];
+        _photoDesView.font = [UIFont systemFontOfSize:15];
         _photoDesView.textColor = [UIColor whiteColor];
         _photoDesView.backgroundColor = [UIColor clearColor];
         _photoDesView.delegate = self;

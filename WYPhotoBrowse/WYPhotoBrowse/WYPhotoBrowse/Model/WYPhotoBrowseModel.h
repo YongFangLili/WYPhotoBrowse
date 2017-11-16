@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Photos/Photos.h>
 
 @interface WYPhotoBrowseModel : NSObject
 
@@ -20,5 +21,10 @@
 @property (nonatomic, copy) NSString *photoesTitle;
 /** 默认图名称 */
 @property (nonatomic, copy) NSString *photoesDefaultStr;
+/** 图片ID */
+@property (nonatomic, copy) NSString *photoID;
+/**  PHAsset 从相册取的图片 */
+@property (nonatomic, strong) PHAsset * photoPHAsset;
+
 
 @end

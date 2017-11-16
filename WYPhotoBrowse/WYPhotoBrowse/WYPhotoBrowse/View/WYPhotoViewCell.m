@@ -10,14 +10,13 @@
 #import <UIImageView+WebCache.h>
 #import <SDWebImage/UIView+WebCache.h>
 #import "WYPhotoBrowseAcitivityIndicatorView.h"
+#import <Photos/Photos.h>
 
 @interface WYPhotoViewCell ()<UIScrollViewDelegate,UIGestureRecognizerDelegate>
 
 /** UIScrollView */
 @property (nonatomic, strong) UIScrollView *scrollView;
 /** 小菊花 */
-@property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
-
 @property (nonatomic, strong) WYPhotoBrowseAcitivityIndicatorView *indicatorView;
 /** 最小缩放 */
 @property (nonatomic, assign) CGFloat miniScale;
@@ -32,22 +31,14 @@
     if (self = [super initWithFrame:frame]) {
         
         [self.contentView addSubview:self.scrollView];
-        [self.scrollView addSubview:self.imageView];
-        self.scrollView.frame = self.bounds;
-        self.imageView.frame = self.scrollView.bounds;
+        [self.scrollView addSubview:self.photoImageView];
+        self.scrollView.frame = self.contentView.bounds;
+        self.photoImageView.frame = self.scrollView.bounds;
         self.miniScale = 1.0;
-        self.maxScale = 3.0;
+        self.maxScale = 2.0;
+        self.scrollView.zoomScale = self.miniScale;
+        self.scrollView.maximumZoomScale = self.maxScale;
         [self addGesHandles];
-        self.activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:(UIActivityIndicatorViewStyleGray)];
-//        self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
-//        //设置小菊花的frame
-//        self.activityIndicator.frame= CGRectMake(100, 100, 50, 50);
-//        //设置小菊花颜色
-//        self.activityIndicator.color = [UIColor whiteColor];
-//        //设置背景颜色
-//        self.activityIndicator.backgroundColor = [UIColor clearColor];
-//        self.activityIndicator.center = self.contentView.center;
-//        self.activityIndicator.hidesWhenStopped = NO;
     }
     return self;
 }
@@ -83,7 +74,6 @@
     }else {
         [self.scrollView setZoomScale:self.maxScale animated:YES];
     }
-    
 }
 
 /**
@@ -102,12 +92,12 @@
  */
 - (void)resetMMZoomScale {
     
-    CGFloat Rw = MAX(1, _imageView.image.size.width /  _scrollView.frame.size.width);
-    CGFloat Rh = MAX(1, _imageView.image.size.height / _scrollView.frame.size.height);
+    CGFloat Rw = MAX(1, _photoImageView.image.size.width /  _scrollView.frame.size.width);
+    CGFloat Rh = MAX(1, _photoImageView.image.size.height / _scrollView.frame.size.height);
     _scrollView.contentOffset = CGPointZero;
     _scrollView.contentSize = self.bounds.size;
     _scrollView.minimumZoomScale = 1;
-    _scrollView.maximumZoomScale = MAX(MAX(Rw, Rh), 1);
+    _scrollView.maximumZoomScale = MAX(MAX(Rw, Rh), self.maxScale);
     if (_scrollView.maximumZoomScale == self.miniScale) {
         _scrollView.maximumZoomScale = self.maxScale;
     }
@@ -118,89 +108,105 @@
 #pragma mark - scrollViewDelegate
 -(UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
     
-    return self.imageView;
+    return self.photoImageView;
 }
 
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView {
     
     CGFloat Ws = _scrollView.frame.size.width - _scrollView.contentInset.left - _scrollView.contentInset.right;
     CGFloat Hs = _scrollView.frame.size.height - _scrollView.contentInset.top - _scrollView.contentInset.bottom;
-    CGFloat W = self.imageView.frame.size.width;
-    CGFloat H = self.imageView.frame.size.height;
-    CGRect rct = self.imageView.frame;
+    CGFloat W = self.photoImageView.frame.size.width;
+    CGFloat H = self.photoImageView.frame.size.height;
+    CGRect rct = self.photoImageView.frame;
     rct.origin.x = MAX((NSInteger)(Ws-W)/2, 0);
     rct.origin.y = MAX((NSInteger)(Hs-H)/2, 0);
-    self.imageView.frame = rct;
+    self.photoImageView.frame = rct;
 }
 
-/**
- * @brief 显示菊花
- */
-- (void)showActivityAdicator {
-    
-    self.activityIndicator.hidesWhenStopped = NO;
-    [self.activityIndicator startAnimating];
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale {
 }
-/**
- * @brief 隐藏菊花
- */
-- (void)hideActivityAdicator {
+
+/** 请求相册里面的大图 */
+- (void)requestImageFromModel:(WYPhotoBrowseModel *)model successBlock:(void (^)(UIImage * result))block {
     
-    [self.activityIndicator stopAnimating];
-    self.activityIndicator.hidesWhenStopped = YES;
+    if (!model.photoPHAsset) {
+        block(nil);
+    } else {
+        PHImageRequestOptions * options = [[PHImageRequestOptions alloc] init];
+        options.resizeMode = PHImageRequestOptionsResizeModeExact;
+        options.deliveryMode  = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+        [[PHImageManager defaultManager] requestImageDataForAsset:model.photoPHAsset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                UIImage *image = [UIImage imageWithData:imageData];
+                block(image);
+            });
+        }];
+    }
+}
+
+#pragma mark - private method
+- (void)setZoomScaleWithImage:(UIImage *)image {
+    
+    self.scrollView.zoomScale = self.miniScale;
+    CGSize size = image.size;
+    CGFloat ratio = MAX(size.width / self.scrollView.frame.size.width,size.height / self.scrollView.frame.size.height);
+    if(ratio < 1) {
+        self.photoImageView.frame = CGRectMake(0, 0, size.width, size.height);
+        self.photoImageView.center = CGPointMake(CGRectGetWidth(self.scrollView.frame)/2.0,CGRectGetHeight(self.scrollView.frame)/2.0);
+    }else {
+        self.photoImageView.frame = CGRectMake(0, 0,CGRectGetWidth(self.scrollView.frame),CGRectGetHeight(self.scrollView.frame));
+    }
+    [self resetMMZoomScale];
+    self.scrollView.zoomScale = self.miniScale;
 }
 
 #pragma mark- setters and getters
 - (void)setModel:(WYPhotoBrowseModel *)model {
     
     _model = model;
-    [self resetMMZoomScale];
-//    [self showActivityAdicator];
+    self.scrollView.zoomScale = self.miniScale;
     [self.indicatorView removeFromSuperview];
     self.indicatorView = nil;
     [self.indicatorView showIndicatorView];
-    // 以缩略图作为默认进来的图片
-    [self setHightImageWithURL:model.photoHightImageUrlStr thumbImage:nil];
-//    __weak typeof(self) weakSelf = self;
-//    [self.imageView sd_setImageWithURL:[NSURL URLWithString:model.photoThumbnailUrlStr] placeholderImage:nil completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-//        [weakSelf setHightImageWithURL:model.photoHightImageUrlStr thumbImage:image];
-//    }];
+    __weak typeof(self)weakSelf = self;
+    if (model.photoPHAsset) {
+        [self requestImageFromModel:model successBlock:^(UIImage *result) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf.indicatorView stopIndicatorWithSucess: ((result == nil)? NO : YES)];
+                weakSelf.photoImageView.image = result;
+                [weakSelf setZoomScaleWithImage:weakSelf.photoImageView.image];
+            });
+        }];
+    }else {
+        // 加载网络图片
+        [self setHightImageWithURL:model.photoHightImageUrlStr thumbImage:nil];
+    }
 }
 
+/**
+ * @brief 设置大图
+ */
 - (void)setHightImageWithURL:(NSString *)url thumbImage:(UIImage *)thumbImage {
     
-    [self.imageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:thumbImage completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+    [self.photoImageView sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:thumbImage completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
         // 隐藏菊花
-//        [self hideActivityAdicator];
+        //        [self hideActivityAdicator];
         [self.indicatorView stopIndicatorWithSucess: !(!image && error)];
         if (!image && error) {
-//            if (self.delegate && [self.delegate respondsToSelector:@selector(wyPhotoBrowseCellLoadImageFaliured)]) {
-//                [self.delegate wyPhotoBrowseCellLoadImageFaliured];
-//            }
             return;
         }
-        self.scrollView.zoomScale = self.miniScale;
-        CGSize size = image.size;
-        CGFloat ratio = MAX(size.width / _scrollView.frame.size.width,size.height / _scrollView.frame.size.height);
-        if(ratio < 1) {
-            self.imageView.frame = CGRectMake(0, 0, size.width, size.height);
-            self.imageView.center = CGPointMake(CGRectGetWidth(self.scrollView.frame)/2.0,CGRectGetHeight(self.scrollView.frame)/2.0);
-        }else {
-            self.imageView.frame = CGRectMake(0, 0,CGRectGetWidth(self.scrollView.frame),CGRectGetHeight(self.scrollView.frame));
-        }
-        [self resetMMZoomScale];
-        self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
+        [self setZoomScaleWithImage:image];
     }];
 }
 
-- (UIImageView *)imageView {
+- (UIImageView *)photoImageView {
     
-    if (!_imageView) {
-        _imageView = [[UIImageView alloc] init];
-        _imageView.contentMode = UIViewContentModeScaleAspectFit;
-        _imageView.backgroundColor = [UIColor clearColor];
+    if (!_photoImageView) {
+        _photoImageView = [[UIImageView alloc] init];
+        _photoImageView.contentMode = UIViewContentModeScaleAspectFit;
+        _photoImageView.backgroundColor = [UIColor clearColor];
     }
-    return _imageView;
+    return _photoImageView;
 }
 
 - (UIScrollView *)scrollView {
@@ -218,7 +224,7 @@
 }
 
 - (WYPhotoBrowseAcitivityIndicatorView *)indicatorView {
-
+    
     if (!_indicatorView) {
         _indicatorView = [[WYPhotoBrowseAcitivityIndicatorView alloc] initWithFrame:self.contentView.bounds];
         [self.contentView addSubview:_indicatorView];
@@ -226,3 +232,4 @@
     return _indicatorView;
 }
 @end
+

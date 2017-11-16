@@ -34,7 +34,7 @@ typedef NS_ENUM(NSUInteger, eWYPhotoBrowseInteractiveType) {
 /**
  * @brief loadView
  */
-- (void)wyPhotoBrowseControllerLoadView;
+- (void)wyPhotoBrowseControllerLoadView:(UIViewController *)vc;
 /**
  * @brief viewWillAppear
  */

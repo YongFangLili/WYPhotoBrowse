@@ -12,6 +12,10 @@
 		3D1064A71FA07E8200E64142 /* WYPhotoBrowseDrivenInteractive.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1064A61FA07E8200E64142 /* WYPhotoBrowseDrivenInteractive.m */; };
 		3D1064AA1FA0816100E64142 /* WYPhotoBrowseTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1064A91FA0816100E64142 /* WYPhotoBrowseTransition.m */; };
 		3D5E49CE1FA8764300C9DF68 /* WYPhotoBrowseAcitivityIndicatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D5E49CD1FA8764300C9DF68 /* WYPhotoBrowseAcitivityIndicatorView.m */; };
+		3D6E887A1FAAC30A00AED037 /* WYPhotoBrowse_close@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D6E88761FAAC30A00AED037 /* WYPhotoBrowse_close@2x.png */; };
+		3D6E887B1FAAC30A00AED037 /* WYPhotoBrowse_close@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D6E88771FAAC30A00AED037 /* WYPhotoBrowse_close@3x.png */; };
+		3D6E887C1FAAC30A00AED037 /* WYPhotoBrowse_loadfail@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D6E88781FAAC30A00AED037 /* WYPhotoBrowse_loadfail@2x.png */; };
+		3D6E887D1FAAC30A00AED037 /* WYPhotoBrowse_loadfail@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D6E88791FAAC30A00AED037 /* WYPhotoBrowse_loadfail@3x.png */; };
 		3D85108B1F95A298008303C1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D85108A1F95A298008303C1 /* main.m */; };
 		3D85108E1F95A298008303C1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D85108D1F95A298008303C1 /* AppDelegate.m */; };
 		3D8510911F95A298008303C1 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D8510901F95A298008303C1 /* ViewController.m */; };
@@ -53,12 +57,12 @@
 		3D1064A61FA07E8200E64142 /* WYPhotoBrowseDrivenInteractive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WYPhotoBrowseDrivenInteractive.m; sourceTree = "<group>"; };
 		3D1064A81FA0816100E64142 /* WYPhotoBrowseTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WYPhotoBrowseTransition.h; sourceTree = "<group>"; };
 		3D1064A91FA0816100E64142 /* WYPhotoBrowseTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WYPhotoBrowseTransition.m; sourceTree = "<group>"; };
-		3D5E49BF1FA8700A00C9DF68 /* WYPhotoBrowse_close@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WYPhotoBrowse_close@3x.png"; sourceTree = "<group>"; };
-		3D5E49C01FA8700A00C9DF68 /* WYPhotoBrowse_loadfail@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WYPhotoBrowse_loadfail@3x.png"; sourceTree = "<group>"; };
-		3D5E49C11FA8700B00C9DF68 /* WYPhotoBrowse_close@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WYPhotoBrowse_close@2x.png"; sourceTree = "<group>"; };
-		3D5E49C21FA8700B00C9DF68 /* WYPhotoBrowse_loadfail@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WYPhotoBrowse_loadfail@2x.png"; sourceTree = "<group>"; };
 		3D5E49CC1FA8764300C9DF68 /* WYPhotoBrowseAcitivityIndicatorView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WYPhotoBrowseAcitivityIndicatorView.h; sourceTree = "<group>"; };
 		3D5E49CD1FA8764300C9DF68 /* WYPhotoBrowseAcitivityIndicatorView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WYPhotoBrowseAcitivityIndicatorView.m; sourceTree = "<group>"; };
+		3D6E88761FAAC30A00AED037 /* WYPhotoBrowse_close@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WYPhotoBrowse_close@2x.png"; sourceTree = "<group>"; };
+		3D6E88771FAAC30A00AED037 /* WYPhotoBrowse_close@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WYPhotoBrowse_close@3x.png"; sourceTree = "<group>"; };
+		3D6E88781FAAC30A00AED037 /* WYPhotoBrowse_loadfail@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WYPhotoBrowse_loadfail@2x.png"; sourceTree = "<group>"; };
+		3D6E88791FAAC30A00AED037 /* WYPhotoBrowse_loadfail@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "WYPhotoBrowse_loadfail@3x.png"; sourceTree = "<group>"; };
 		3D8510861F95A298008303C1 /* WYPhotoBrowse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WYPhotoBrowse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D85108A1F95A298008303C1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		3D85108C1F95A298008303C1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -111,13 +115,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3D5E49BE1FA86FF800C9DF68 /* Resource */ = {
+		3D6E88751FAAC30A00AED037 /* Resource */ = {
 			isa = PBXGroup;
 			children = (
-				3D5E49C11FA8700B00C9DF68 /* WYPhotoBrowse_close@2x.png */,
-				3D5E49BF1FA8700A00C9DF68 /* WYPhotoBrowse_close@3x.png */,
-				3D5E49C21FA8700B00C9DF68 /* WYPhotoBrowse_loadfail@2x.png */,
-				3D5E49C01FA8700A00C9DF68 /* WYPhotoBrowse_loadfail@3x.png */,
+				3D6E88761FAAC30A00AED037 /* WYPhotoBrowse_close@2x.png */,
+				3D6E88771FAAC30A00AED037 /* WYPhotoBrowse_close@3x.png */,
+				3D6E88781FAAC30A00AED037 /* WYPhotoBrowse_loadfail@2x.png */,
+				3D6E88791FAAC30A00AED037 /* WYPhotoBrowse_loadfail@3x.png */,
 			);
 			path = Resource;
 			sourceTree = "<group>";
@@ -190,7 +194,7 @@
 		3D8510BC1F95A2E9008303C1 /* WYPhotoBrowse */ = {
 			isa = PBXGroup;
 			children = (
-				3D5E49BE1FA86FF800C9DF68 /* Resource */,
+				3D6E88751FAAC30A00AED037 /* Resource */,
 				3D8510BD1F95A2E9008303C1 /* Controller */,
 				3D8510BE1F95A2E9008303C1 /* Model */,
 				3D8510BF1F95A2E9008303C1 /* View */,
@@ -362,8 +366,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D6E887A1FAAC30A00AED037 /* WYPhotoBrowse_close@2x.png in Resources */,
+				3D6E887C1FAAC30A00AED037 /* WYPhotoBrowse_loadfail@2x.png in Resources */,
 				3D8510991F95A298008303C1 /* LaunchScreen.storyboard in Resources */,
+				3D6E887B1FAAC30A00AED037 /* WYPhotoBrowse_close@3x.png in Resources */,
 				3D8510961F95A298008303C1 /* Assets.xcassets in Resources */,
+				3D6E887D1FAAC30A00AED037 /* WYPhotoBrowse_loadfail@3x.png in Resources */,
 				3D8510941F95A298008303C1 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

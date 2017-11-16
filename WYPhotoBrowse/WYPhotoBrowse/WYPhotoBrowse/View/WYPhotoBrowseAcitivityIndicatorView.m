@@ -30,7 +30,7 @@
     if (self = [super initWithFrame:frame]) {
         [self addSubview:self.activityIndicator];
         [self addSubview:self.lableView];
-        self.activityIndicator.frame = CGRectMake(self.center.x - 50 / 2, self.center.y - 50 / 2, 50, 50);
+        self.activityIndicator.frame = CGRectMake(self.center.x - 30 / 2 , self.center.y - 30 / 2 - 10, 30, 30);
         self.lableView.frame = CGRectMake(0, CGRectGetMaxY(self.activityIndicator.frame) + 5,self.bounds.size.width, 16);
     }
     return self;
@@ -41,6 +41,8 @@
  */
 - (void)showIndicatorView {
     
+    self.activityIndicator.frame = CGRectMake(self.center.x - 30 / 2 ,self.center.y - 30 / 2 -10, 30, 30);
+    self.lableView.frame = CGRectMake(0, CGRectGetMaxY(self.activityIndicator.frame) + 20,self.bounds.size.width, 16);
     self.activityIndicator.hidesWhenStopped = NO;
     [self.activityIndicator startAnimating];
 }
@@ -48,7 +50,7 @@
 /**
  * @brief 影藏View
  */
-- (void)stopIndicatorWithSucess:(BOOL)isSucecess;{
+- (void)stopIndicatorWithSucess:(BOOL)isSucecess {
     
     [self.activityIndicator stopAnimating];
     self.activityIndicator.hidesWhenStopped = YES;
@@ -57,9 +59,9 @@
     }else {
         self.faliureImageView.hidden = NO;
         [self addSubview:self.faliureImageView];
-        self.faliureImageView.frame = CGRectMake(self.center.x - 103 / 2, self.center.y - 88 / 2, 103, 88);
-        self.lableView.frame = CGRectMake(0, CGRectGetMaxY(self.faliureImageView.frame) + 5,self.bounds.size.width, 16);
-        self.lableView.text = @"图片加载失败";
+        self.faliureImageView.frame = CGRectMake(self.center.x - 103 / 2, self.center.y - 88 / 2 - 10, 103, 88);
+        self.lableView.frame = CGRectMake(0, CGRectGetMaxY(self.faliureImageView.frame) + 20,self.bounds.size.width, 16);
+        self.lableView.text = @"图片加载失败, 请稍后重试";
     }
 }
 
@@ -67,14 +69,13 @@
 - (UIActivityIndicatorView *)activityIndicator {
     
     if (!_activityIndicator) {
-        _activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:(UIActivityIndicatorViewStyleWhite)];
+        _activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:(UIActivityIndicatorViewStyleWhiteLarge)];
         //设置小菊花的frame
-        _activityIndicator.frame= CGRectMake(100, 100, 50, 50);
+        _activityIndicator.frame= CGRectMake(self.center.x - 30 / 2 , self.bounds.size.height / 2- 30 / 2 - 10, 30, 30);
         //设置小菊花颜色
         _activityIndicator.color = [UIColor whiteColor];
         //设置背景颜色
         _activityIndicator.backgroundColor = [UIColor clearColor];
-        _activityIndicator.center = self.center;
         _activityIndicator.hidesWhenStopped = NO;
     }
     return _activityIndicator;
@@ -87,7 +88,7 @@
         _lableView.textColor = [UIColor whiteColor];
         _lableView.font = [UIFont systemFontOfSize:15];
         _lableView.textAlignment = NSTextAlignmentCenter;
-        _lableView.text = @"图片加载中，请稍后";
+        _lableView.text = @"加载中，请稍后";
     }
     return _lableView;
 }
@@ -97,7 +98,7 @@
     if (!_faliureImageView) {
         _faliureImageView = [[UIImageView alloc] init];
         _faliureImageView.hidden = YES;
-        _faliureImageView.backgroundColor = [UIColor redColor];
+        _faliureImageView.backgroundColor = [UIColor clearColor];
         _faliureImageView.contentMode = UIViewContentModeScaleAspectFit;
         _faliureImageView.image = [UIImage imageNamed:@"WYPhotoBrowse_loadfail"];
     }
